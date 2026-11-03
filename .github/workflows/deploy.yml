@@ -1,0 +1,77 @@
+# 말로 만든 수업 도구 — © 2026 티쳐무 · 모든 권리 보유
+# 이 저장소에는 빌드가 끝난 결과물(로컬 dist/ 를 옮긴 것)만 있다. 여기서는 빌드하지 않고,
+# 점검만 한 뒤 그대로 GitHub Pages 로 올린다. (Pages Source 는 「GitHub Actions」)
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ⚠ 셸 변수 이름은 반드시 ASCII 로 쓴다. 한글로 쓰면 bash 가 command not found 로 죽는다.
+      - name: 올릴 파일 점검
+        run: |
+          for FILE in index.html claude-vibe-coding-teacher-training.html; do
+            test -f "$FILE" || { echo "::error::$FILE 이 없습니다"; exit 1; }
+          done
+
+          # 개발용 껍데기(1KB 남짓)가 아니라 빌드한 한 파일이어야 한다
+          SIZE=$(wc -c < index.html)
+          echo "index.html 크기: ${SIZE} 바이트"
+          if [ "$SIZE" -lt 100000 ]; then
+            echo "::error::index.html 이 너무 작습니다 (${SIZE} 바이트). dist 가 아니라 개발용 index.html 을 올렸을 수 있습니다."
+            exit 1
+          fi
+
+          SHOTS=$(ls shots/*.webp 2>/dev/null | wc -l)
+          echo "캡처: ${SHOTS}장"
+          if [ "$SHOTS" -lt 90 ]; then
+            echo "::error::캡처가 ${SHOTS}장뿐입니다. shots/ 를 함께 올렸는지 보세요."
+            exit 1
+          fi
+
+          MARKS=$(grep -o 티쳐무 index.html | wc -l)
+          echo "저작권 표시: ${MARKS}곳"
+          if [ "$MARKS" -lt 3 ]; then
+            echo "::error::저작권 표시가 사라졌습니다."
+            exit 1
+          fi
+
+          echo "✅ 점검 통과"
+
+      - name: 올릴 폴더 꾸리기
+        run: |
+          mkdir _site
+          cp index.html claude-vibe-coding-teacher-training.html _site/
+          cp -r shots _site/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

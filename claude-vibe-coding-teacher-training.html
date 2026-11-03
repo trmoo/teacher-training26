@@ -1,0 +1,1668 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add("js")</script>
+<title>말로 만드는 수업 도구: Claude와 Claude Code 바이브 코딩 교원 연수 자료</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F9F6; --paper-raised:#FFFFFF; --ink:#1B2620; --ink-soft:#4E5D55; --rule:#D4DDD7;
+  --grid:#93C3A8; --board:#23372D; --chalk:#EEF3ED; --chalk-dim:#A6BBAF;
+  --pen:#BE3A23; --pen-wash:#FBEFEB; --hl:#F8E27C; --accent:#2A7150; --accent-wash:#E6F0EA;
+  --serif:"Hahmlet","Noto Serif KR","Nanum Myeongjo","AppleMyungjo",serif;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131B17; --paper-raised:#19231E; --ink:#E6EDE8; --ink-soft:#A7B6AD; --rule:#2E3B34;
+    --grid:#3F5C4C; --board:#0D1411; --chalk:#E8EFE9; --chalk-dim:#8EA597;
+    --pen:#FF8B72; --pen-wash:#2A1D1A; --hl:rgba(248,226,124,.30); --accent:#7DC9A0; --accent-wash:#1B2A22;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131B17; --paper-raised:#19231E; --ink:#E6EDE8; --ink-soft:#A7B6AD; --rule:#2E3B34;
+  --grid:#3F5C4C; --board:#0D1411; --chalk:#E8EFE9; --chalk-dim:#8EA597;
+  --pen:#FF8B72; --pen-wash:#2A1D1A; --hl:rgba(248,226,124,.30); --accent:#7DC9A0; --accent-wash:#1B2A22;
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.75;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:.22em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{margin:0;line-height:1.35;font-weight:600}
+h2,h3{font-family:var(--serif);letter-spacing:-.01em}
+p{margin:0 0 1rem}
+ul,ol{margin:0 0 1.25rem;padding-left:1.3rem}
+li{margin:.3rem 0}
+li::marker{color:var(--ink-soft)}
+strong{font-weight:600}
+code{font-family:var(--mono);font-size:.88em;background:var(--accent-wash);padding:.08em .38em;border-radius:3px;overflow-wrap:anywhere}
+kbd{font-family:var(--mono);font-size:.8em;line-height:1;display:inline-block;padding:.24em .45em;border:1px solid var(--rule);border-bottom-width:2px;border-radius:4px;background:var(--paper-raised);color:var(--ink);white-space:nowrap;vertical-align:.08em}
+mark{background:linear-gradient(transparent 56%,var(--hl) 56%);color:inherit;padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:1rem;top:-4rem;z-index:10;background:var(--ink);color:var(--paper);padding:.5rem .9rem;border-radius:4px}
+.skip:focus{top:1rem}
+
+/* 표지: 원고지 */
+.hero-sheet{
+  --cols:8; --c:calc((100vw - 24px) / 8);
+  --g:calc(var(--c) * .3); --p:calc(var(--c) + var(--g));
+  --indent:1; --trail:0;
+  overflow:hidden;
+  padding:var(--p) 0 calc(var(--g) + var(--c) + 1px);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(to bottom, transparent calc(var(--c) + 1px), var(--paper) calc(var(--c) + 1px)),
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px, transparent var(--c), var(--grid) var(--c), var(--grid) calc(var(--c) + 1px), transparent calc(var(--c) + 1px));
+  background-size:var(--c) var(--p);
+  background-position:calc(50% + var(--c) / 2) 0;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+@supports (width:round(down,100px,1px)){
+  .hero-sheet{--c:round(down, calc((100vw - 24px) / 8), 1px)}
+}
+@media (min-width:600px){
+  .hero-sheet{--cols:12;--c:min(calc((100vw - 64px) / 12), 60px);--indent:3;--trail:2}
+  @supports (width:round(down,100px,1px)){
+    .hero-sheet{--c:min(round(down, calc((100vw - 64px) / 12), 1px), 60px)}
+  }
+}
+@media (min-width:1100px){
+  .hero-sheet{--cols:16;--c:64px;--indent:5;--trail:3}
+}
+.sheet{width:calc(var(--cols) * var(--c));margin-left:calc((100% - var(--cols) * var(--c)) / 2);display:flex;flex-direction:column;gap:var(--g)}
+.sheet-title{display:flex;flex-direction:column;gap:var(--g);margin:0;font:inherit}
+.sheet .row{display:flex;height:var(--c);margin:0}
+.sheet-title .row{padding-left:calc(var(--c) * var(--indent))}
+.sheet .row-name{justify-content:flex-end;padding-right:calc(var(--c) * var(--trail))}
+.cell{flex:none;width:var(--c);height:var(--c);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;font-size:calc(var(--c) * .56);line-height:1;color:var(--ink)}
+.row-name .cell{font-weight:400;font-size:calc(var(--c) * .44);color:var(--ink-soft)}
+
+/* 공통 틀 */
+.wrap{max-width:74rem;margin:0 auto;padding:0 1.25rem}
+@media (min-width:600px){.wrap{padding:0 2rem}}
+.intro{padding:2.25rem 0 2.75rem;border-bottom:1px solid var(--rule)}
+.intro-lead{font-size:1.25rem;line-height:1.7;max-width:40rem;margin-bottom:.75rem}
+.intro-date{font-size:.9375rem;color:var(--ink-soft);max-width:40rem;margin-bottom:0}
+.overview{display:grid;gap:2.5rem;margin-top:2.75rem}
+@media (min-width:920px){.overview{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:4rem}}
+.overview-h{font-size:1.1875rem;margin:0 0 .75rem}
+.overview-h.next{margin-top:2.25rem}
+.facts{margin:0 0 1.25rem}
+.facts div{display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:.75rem;padding:.55rem 0;border-top:1px solid var(--rule)}
+.facts div:last-child{border-bottom:1px solid var(--rule)}
+.facts dt{font-weight:600}
+.facts dd{margin:0}
+.small{font-size:.9375rem;color:var(--ink-soft)}
+.timetable th a{color:inherit;text-decoration:none;border-bottom:1px solid var(--grid)}
+.timetable th a:hover{color:var(--accent)}
+.timetable td:last-child,.timetable thead th:last-child{text-align:right;white-space:nowrap}
+.timetable tfoot td{font-weight:600;border-top:2px solid var(--ink);border-bottom:0}
+.timetable tfoot tr + tr td{font-weight:400;color:var(--ink-soft);border-top:1px solid var(--rule)}
+
+/* 차례 */
+.toc-mobile{margin:1.75rem 0 0;border:1px solid var(--rule);border-radius:6px;background:var(--paper-raised)}
+.toc-mobile summary{cursor:pointer;padding:.7rem 1rem;font-weight:600}
+.toc-mobile ol{margin:0;padding:0 1rem .75rem;list-style:none}
+.toc-mobile li{margin:0}
+.toc-list a{display:flex;gap:.6rem;padding:.35rem 0;color:var(--ink);text-decoration:none;line-height:1.5}
+.toc-list a span{flex:none;width:2.9rem;color:var(--ink-soft);font-size:.875rem;padding-top:.08rem}
+.toc-list a:hover{color:var(--accent)}
+.toc-list a[aria-current="true"],.toc-list a[aria-current="true"] span{color:var(--accent)}
+.toc-list a[aria-current="true"]{font-weight:600}
+.toc{display:none}
+.layout{padding-bottom:4rem}
+.content{max-width:46rem;min-width:0}
+@media (min-width:1080px){
+  .toc-mobile{display:none}
+  .layout{display:grid;grid-template-columns:14rem minmax(0,1fr);gap:4.5rem}
+  .toc{display:block;position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:4.5rem 0 2rem}
+  .toc-title{font-family:var(--serif);font-weight:600;margin:0 0 .6rem}
+  .toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--rule)}
+  .toc li{margin:0}
+  .toc .toc-list a{padding:.42rem 0 .42rem 1rem;margin-left:-1px;border-left:2px solid transparent}
+  .toc .toc-list a[aria-current="true"]{border-left-color:var(--accent)}
+}
+
+/* 교시 */
+.period{padding-top:4.5rem;scroll-margin-top:.5rem}
+.period-head{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:1.1rem;row-gap:.2rem;padding-bottom:1.25rem;margin-bottom:1.75rem;border-bottom:2px solid var(--ink)}
+.period-no{grid-row:1 / span 2;align-self:center;margin:0;width:3.75rem;height:3.75rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--grid);background:var(--paper-raised);line-height:1}
+.period-no .n{font-family:var(--serif);font-weight:600;font-size:1.75rem}
+.period-no .u{font-size:.6875rem;color:var(--ink-soft);margin-top:.22rem}
+.period-no .n-word{font-size:1.0625rem}
+.period-head h2{font-size:clamp(1.625rem,1.15rem + 1.5vw,2.25rem);line-height:1.25;align-self:end}
+.period-meta{margin:0;color:var(--ink-soft);font-size:.9375rem;align-self:start}
+.content h3{font-size:1.3125rem;margin:2.75rem 0 .8rem;scroll-margin-top:1rem}
+.content .sub-h{margin:1.75rem 0 .35rem}
+.content h4{font-size:1.0625rem;font-family:var(--sans);margin:0 0 .35rem}
+.goals{background:var(--accent-wash);border-left:3px solid var(--accent);padding:1rem 1.25rem .5rem;margin:0 0 1.5rem}
+.goals-title{font-family:var(--serif);font-weight:600;margin:0 0 .3rem}
+.goals ul{margin:0 0 .5rem}
+.cell-sub{display:block;font-weight:400;font-size:.8125rem;color:var(--ink-soft);margin-top:.15rem}
+.pull{font-family:var(--serif);font-size:1.1875rem;line-height:1.75;margin:1.25rem 0 1.5rem}
+
+/* 프롬프트 카드와 칠판 */
+figure{margin:1.1rem 0 1.5rem}
+.fig-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:2.6rem;padding:.3rem .45rem .3rem 1rem;font-size:.8125rem;line-height:1.4;color:var(--ink-soft)}
+.prompt{background:var(--paper-raised);border:1px solid var(--rule);border-radius:6px}
+.prompt .fig-bar{border-bottom:1px dashed var(--rule)}
+.prompt pre{margin:0;padding:.95rem 1.1rem 1.1rem;font-family:var(--sans);font-size:1rem;line-height:1.75;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;color:var(--ink)}
+.prompt-weak{border-style:dashed;background:transparent}
+.prompt-weak pre{color:var(--ink-soft)}
+.board{background:var(--board);color:var(--chalk);border-radius:6px}
+.board .fig-bar{color:var(--chalk-dim);border-bottom:1px solid rgba(255,255,255,.09)}
+.board pre{margin:0;padding:.85rem 1.1rem 1rem;overflow-x:auto;font-family:var(--mono);font-size:.9375rem;line-height:1.7;white-space:pre}
+.board pre.soft{white-space:pre-wrap;word-break:keep-all}
+.board code{background:none;padding:0;color:inherit;font-size:inherit;border-radius:0;overflow-wrap:normal}
+.copy{flex:none;font:inherit;font-size:.8125rem;line-height:1;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:4px;padding:.5rem .75rem;cursor:pointer}
+.copy:hover{border-color:var(--ink-soft)}
+.board .copy{color:var(--chalk);border-color:rgba(255,255,255,.24)}
+.board .copy:hover{border-color:rgba(255,255,255,.55)}
+html:not(.js) .copy,html:not(.js) .btn-plain{display:none}
+.btn-plain{font:inherit;font-size:.875rem;line-height:1;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:4px;padding:.6rem .85rem;cursor:pointer}
+.btn-plain:hover{border-color:var(--ink-soft)}
+
+/* 알림 */
+.note{margin:1.5rem 0;padding:.85rem 1.1rem;border-left:3px solid var(--grid)}
+.note p{margin:0}
+.note p + p{margin-top:.6rem}
+.note .label{margin-right:.45rem;color:var(--accent)}
+.note-pen{border-left-color:var(--pen);background:var(--pen-wash)}
+.note-pen .label{color:var(--pen)}
+
+/* 표 */
+.table-wrap{overflow-x:auto;margin:1.1rem 0 1.6rem;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.96875rem;line-height:1.6}
+table.wide{min-width:36rem}
+th,td{text-align:left;vertical-align:top;padding:.62rem .9rem .62rem 0;border-bottom:1px solid var(--rule)}
+th:last-child,td:last-child{padding-right:0}
+thead th{font-weight:600;font-size:.875rem;color:var(--ink-soft);border-bottom:2px solid var(--ink);white-space:nowrap}
+tbody th{font-weight:600}
+
+/* 단계 */
+.steps{list-style:none;margin:1.5rem 0 2rem;padding:0;counter-reset:step}
+.steps > li{position:relative;counter-increment:step;margin:0;padding:0 0 1.9rem 3.6rem}
+.steps > li::before{content:counter(step);position:absolute;left:0;top:0;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--grid);background:var(--paper-raised);font-family:var(--serif);font-weight:600;font-size:1.125rem;color:var(--ink)}
+.steps > li::after{content:"";position:absolute;left:1.25rem;top:2.5rem;bottom:0;width:1px;background:var(--rule)}
+.steps > li:last-child{padding-bottom:.5rem}
+.steps > li:last-child::after{display:none}
+.steps h4{padding-top:.4rem}
+.steps figure{margin:.9rem 0 1rem}
+@media (max-width:599px){.steps > li{padding-left:2.85rem}.steps > li::before{width:2.1rem;height:2.1rem;font-size:1rem}.steps > li::after{left:1.05rem;top:2.1rem}}
+
+/* 목록 */
+.lead-list{list-style:none;padding:0}
+.lead-list li{padding:.8rem 0;border-top:1px solid var(--rule);margin:0}
+.lead-list li:last-child{border-bottom:1px solid var(--rule)}
+.quotes{list-style:none;padding:0}
+.quotes li{position:relative;padding-left:1.25rem}
+.quotes li::before{content:"";position:absolute;left:0;top:.62em;width:.5rem;height:.5rem;border:1px solid var(--accent)}
+.two-col{display:grid;gap:0 2.5rem}
+@media (min-width:760px){.two-col{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.compare{display:grid;gap:0 1rem;align-items:start}
+@media (min-width:760px){.compare{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}}
+.compare figure{margin:.5rem 0}
+
+/* 점검표 */
+.checklist{list-style:none;padding:0;margin:1rem 0 .5rem}
+.checklist li{margin:0;border-top:1px solid var(--rule)}
+.checklist li:last-child{border-bottom:1px solid var(--rule)}
+.checklist label{display:flex;gap:.8rem;align-items:flex-start;padding:.65rem 0;cursor:pointer}
+.checklist input{flex:none;width:1.15rem;height:1.15rem;margin:.36rem 0 0;accent-color:var(--accent)}
+.checklist input:checked + span{color:var(--ink-soft)}
+.check-progress{font-size:.9375rem;color:var(--ink-soft);margin:.5rem 0 1.5rem;min-height:1.6em}
+
+/* 탭 */
+.tabs{margin:1rem 0 1.5rem}
+.tablist{display:flex;flex-wrap:wrap;gap:.25rem;border-bottom:1px solid var(--rule)}
+.tablist [role="tab"]{font:inherit;font-size:.9375rem;color:var(--ink-soft);background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;padding:.55rem .8rem;cursor:pointer}
+.tablist [role="tab"][aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+html:not(.js) .tablist{display:none}
+[role="tabpanel"]{padding-top:.9rem}
+.panel-label{font-weight:600;margin:0 0 .35rem}
+.js .panel-label{display:none}
+html:not(.js) [role="tabpanel"] + [role="tabpanel"]{margin-top:.5rem;border-top:1px dashed var(--rule)}
+
+/* 아이디어, 활동지, 질문, 링크 */
+.ideas{display:grid;gap:0 2.5rem;margin:1rem 0 2rem}
+@media (min-width:700px){.ideas{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.ideas div{padding:.7rem 0;border-top:1px solid var(--rule)}
+.ideas dt{font-family:var(--serif);font-weight:600}
+.ideas dd{margin:.1rem 0 0;color:var(--ink-soft)}
+.builder{display:grid;gap:.5rem 1.5rem;margin:1.25rem 0 1rem;align-items:start}
+@media (min-width:760px){.builder{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}.builder-out{position:sticky;top:1rem}}
+.field{display:block;margin:0 0 .9rem}
+.field > span{display:block;font-size:.875rem;font-weight:600;margin-bottom:.3rem}
+.field input,.field textarea,.field select{display:block;width:100%;font:inherit;font-size:1rem;line-height:1.5;color:var(--ink);background:var(--paper-raised);border:1px solid var(--rule);border-radius:4px;padding:.55rem .7rem}
+.field textarea{resize:vertical;min-height:5.5rem}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink-soft);opacity:.8}
+.builder-out{margin-top:0}
+@media (min-width:760px){.builder-out{margin-top:1.55rem}}
+.faq{border-top:1px solid var(--rule)}
+.faq-group .faq:last-child{border-bottom:1px solid var(--rule)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.85rem 0;font-weight:600}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary > span{min-width:0}
+.faq summary::after{content:"+";flex:none;font-family:var(--mono);font-weight:400;color:var(--ink-soft)}
+.faq[open] summary::after{content:"\2212"}
+.faq-body{padding:0 0 .9rem}
+.faq-body p{margin:0}
+.links{list-style:none;padding:0;margin:1rem 0 2rem}
+.links li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.1rem 1rem;padding:.55rem 0;border-top:1px solid var(--rule);margin:0}
+.links li:last-child{border-bottom:1px solid var(--rule)}
+.links .src{font-size:.875rem;color:var(--ink-soft)}
+/* 수칙: 빨간 첨삭 동그라미 */
+.rules{list-style:none;padding:0;margin:1rem 0 1.75rem;counter-reset:rule}
+.rules li{counter-increment:rule;position:relative;margin:0;padding:.85rem 0 .85rem 2.75rem;border-top:1px solid var(--rule)}
+.rules li:last-child{border-bottom:1px solid var(--rule)}
+.rules li::before{content:counter(rule);position:absolute;left:.1rem;top:.9rem;width:1.8rem;height:1.8rem;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--pen);border-radius:50%;color:var(--pen);font-family:var(--serif);font-weight:600;font-size:.95rem;line-height:1;transform:rotate(-8deg)}
+/* 별표: 빨간 펜으로 한 번에 그은 별 + 형광펜 */
+.star-mark{display:inline-block;width:1.5em;height:1.5em;margin:0 .32em 0 -.05em;vertical-align:-.4em;transform:rotate(-9deg)}
+.star-mark svg{display:block;width:100%;height:100%;overflow:visible}
+.star-mark .hl{fill:var(--hl);stroke:var(--hl);stroke-width:1.6;stroke-linejoin:round;transform-origin:12px 12.6px}
+.star-mark .pen{fill:none;stroke:var(--pen);stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.js .star-mark .pen{stroke-dasharray:1 2;stroke-dashoffset:1.1}
+.js .star-mark .hl{opacity:0;transform:scale(.4)}
+.js .star-mark.drawn .pen{stroke-dashoffset:0;transition:stroke-dashoffset .9s cubic-bezier(.55,.05,.35,1)}
+.js .star-mark.drawn .hl{opacity:1;transform:none;transition:opacity .35s ease .75s,transform .45s cubic-bezier(.3,1.6,.5,1) .75s}
+.star-list,.star-ideas{--star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -1 26 26'%3E%3Cpath d='M12.2 2.4 17.7 20.4 2.7 9.5 21.4 9.3 6.2 20.7 12.9 1.5' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.star-list{list-style:none;padding-left:1.75rem}
+.star-list li{position:relative}
+.star-list li::before,.star-ideas dt::before{content:"";width:1em;height:1em;background:var(--pen);-webkit-mask:var(--star) center/contain no-repeat;mask:var(--star) center/contain no-repeat;transform:rotate(-8deg)}
+.star-list li::before{position:absolute;left:-1.6rem;top:.38em}
+.star-list li:nth-child(even)::before{transform:rotate(7deg)}
+.star-ideas dt::before{display:inline-block;width:.95em;height:.95em;margin-right:.4em;vertical-align:-.1em}
+.star-ideas div:nth-child(even) dt::before{transform:rotate(7deg)}
+.two-col figure{margin:.5rem 0 1rem}
+.foot{border-top:1px solid var(--rule);padding:1.5rem 0 2.5rem;color:var(--ink-soft);font-size:.9375rem}
+.foot p{margin:0}
+
+@media print{
+  :root,:root:not([data-theme="light"]),:root[data-theme="dark"]{
+    --paper:#fff;--paper-raised:#fff;--ink:#111;--ink-soft:#444;--rule:#bbb;--grid:#7fb495;
+    --board:#fff;--chalk:#111;--chalk-dim:#555;--pen:#b3321c;--pen-wash:#fff;--accent:#1f5c40;--accent-wash:#fff;--hl:#f3e27a;
+  }
+  body{font-size:10.5pt;line-height:1.6}
+  .toc,.toc-mobile,.copy,.btn-plain,.skip,.tablist,.builder-fields{display:none!important}
+  .js .panel-label{display:block}
+  .layout{display:block}
+  .content{max-width:none}
+  [role="tabpanel"][hidden]{display:block!important}
+  .board{border:1px solid #999}
+  .board pre{white-space:pre-wrap}
+  .period{break-before:page;padding-top:0}
+  figure,.note,.goals,tr,.steps > li{break-inside:avoid}
+  a{color:inherit;text-decoration:none}
+  .js .star-mark .pen{stroke-dashoffset:0}
+  .js .star-mark .hl{opacity:1;transform:none}
+  .star-list li::before,.star-ideas dt::before{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<header class="hero-sheet">
+  <div class="sheet">
+    <h1 class="sheet-title">
+      <span class="sr-only">말로 만드는 수업 도구</span>
+      <span class="row" aria-hidden="true"><span class="cell">말</span><span class="cell">로</span><span class="cell"></span><span class="cell">만</span><span class="cell">드</span><span class="cell">는</span></span>
+      <span class="row" aria-hidden="true"><span class="cell">수</span><span class="cell">업</span><span class="cell"></span><span class="cell">도</span><span class="cell">구</span></span>
+    </h1>
+    <p class="row row-name"><span class="sr-only">교원 연수 자료</span><span class="cell" aria-hidden="true">교</span><span class="cell" aria-hidden="true">원</span><span class="cell" aria-hidden="true"></span><span class="cell" aria-hidden="true">연</span><span class="cell" aria-hidden="true">수</span><span class="cell" aria-hidden="true"></span><span class="cell" aria-hidden="true">자</span><span class="cell" aria-hidden="true">료</span></p>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="intro" id="intro" aria-labelledby="intro-title">
+    <h2 id="intro-title" class="sr-only">연수 안내</h2>
+    <p class="intro-lead">Claude로 수업 준비와 업무를 돕고, Claude Code로 우리 반에 꼭 맞는 수업 도구를 직접 만들어 보는 교원 연수 자료입니다. 심화 과정에서는 오프라인 수행평가 기록 도구와 구글 스프레드시트 자동화까지 다룹니다. 코딩을 해 본 적이 없어도 순서대로 따라 할 수 있게 구성했습니다.</p>
+    <p class="intro-date">Claude Code 설치 방법과 이용 조건은 2026년 9월 공식 문서를 확인해 정리했습니다. 요금제, 모델 이름, 화면 구성은 자주 바뀌므로 연수 전에 부록의 공식 링크로 한 번 더 확인해 주세요.</p>
+
+    <div class="overview">
+      <div>
+        <h3 class="overview-h">연수 목표</h3>
+        <ul>
+          <li>Claude를 쓸 수 있는 곳과 요금제, 안전 수칙을 이해하고 수업과 업무에 맞게 요청할 수 있다.</li>
+          <li>바이브 코딩의 뜻을 이해하고, 설치 없이 채팅만으로 간단한 수업 도구를 만들 수 있다.</li>
+          <li>Claude Code에서 계획, 구현, 확인, 수정의 흐름으로 수업용 웹 도구를 완성하고 안전하게 공유할 수 있다.</li>
+          <li>심화: 인터넷 없이 쓰는 수행평가 기록 도구를 만들고, Apps Script로 학생 활동 기록을 자동으로 정리해 확인할 수 있다.</li>
+        </ul>
+        <h3 class="overview-h next">대상과 준비물</h3>
+        <dl class="facts">
+          <div><dt>대상</dt><dd>초·중·고 교원. 코딩 경험은 없어도 됩니다.</dd></div>
+          <div><dt>기기</dt><dd>macOS 13 이상 또는 Windows 10(1809) 이상, 메모리 4GB 이상인 노트북과 인터넷 연결</dd></div>
+          <div><dt>계정</dt><dd>만 18세 이상만 만들 수 있습니다. 1~3교시는 무료 계정으로 충분하고, 4~5교시 Claude Code는 Pro, Max, Team, Enterprise 플랜이나 Console 계정이 필요합니다. 8교시에는 구글 스프레드시트를 쓸 수 있는 계정이 하나 더 필요합니다.</dd></div>
+          <div><dt>미리 확인</dt><dd>학교망에서 claude.ai에 접속되는지, 학교 PC라면 프로그램 설치가 허용되는지, 8교시를 한다면 학교 구글 계정에서 Apps Script를 쓸 수 있는지</dd></div>
+        </dl>
+        <p class="small">강사는 교시 순서대로 진행하면 됩니다. 혼자 공부한다면 3교시와 5교시 실습만큼은 꼭 직접 해 보세요. 프롬프트 예시는 복사 버튼으로 가져가 [ ] 부분만 바꿔 쓰면 됩니다.</p>
+      </div>
+      <div>
+        <h3 class="overview-h">교시별 구성</h3>
+        <div class="table-wrap">
+          <table class="timetable">
+            <thead><tr><th scope="col">교시</th><th scope="col">주제</th><th scope="col">방식</th><th scope="col">시간</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><a href="#p1">1교시</a></th><td>Claude와 첫 만남</td><td>강의</td><td>25분</td></tr>
+              <tr><th scope="row"><a href="#p2">2교시</a></th><td>수업과 업무에 Claude 쓰기</td><td>강의, 실습</td><td>35분</td></tr>
+              <tr><th scope="row"><a href="#p3">3교시</a></th><td>설치 없이 해 보는 바이브 코딩</td><td>실습</td><td>30분</td></tr>
+              <tr><th scope="row"><a href="#p4">4교시</a></th><td>Claude Code 설치와 첫 세션</td><td>실습</td><td>30분</td></tr>
+              <tr><th scope="row"><a href="#p5">5교시</a></th><td>우리 반 퀴즈 앱 만들기</td><td>실습</td><td>50분</td></tr>
+              <tr><th scope="row"><a href="#p6">6교시</a></th><td>막힐 때 푸는 법과 좋은 습관</td><td>강의</td><td>15분</td></tr>
+              <tr><th scope="row"><a href="#p7">7교시</a></th><td>안전 수칙과 교실 적용 계획</td><td>토의, 실습</td><td>15분</td></tr>
+              <tr><th scope="row"><a href="#p8">8교시</a></th><td>오프라인 수행평가와 학생 활동 기록</td><td>실습, 심화</td><td>50분</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="3">기본 과정 합계 (1~7교시, 쉬는 시간 제외)</td><td>200분</td></tr>
+              <tr><td colspan="3">심화 8교시까지 포함하면</td><td>250분</td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="small">쉬는 시간을 넣으면 기본 과정만 4시간 정도입니다. 두 번에 나누어 운영한다면 1~3교시와 4~7교시로 끊고, 심화인 8교시는 후속 연수로 따로 여는 편이 좋습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <details class="toc-mobile">
+    <summary>차례</summary>
+    <ol class="toc-list">
+      <li><a href="#p1"><span>1교시</span>Claude와 첫 만남</a></li>
+      <li><a href="#p2"><span>2교시</span>수업과 업무에 Claude 쓰기</a></li>
+      <li><a href="#p3"><span>3교시</span>설치 없이 해 보는 바이브 코딩</a></li>
+      <li><a href="#p4"><span>4교시</span>Claude Code 설치와 첫 세션</a></li>
+      <li><a href="#p5"><span>5교시</span>우리 반 퀴즈 앱 만들기</a></li>
+      <li><a href="#p6"><span>6교시</span>막힐 때 푸는 법과 좋은 습관</a></li>
+      <li><a href="#p7"><span>7교시</span>안전 수칙과 교실 적용 계획</a></li>
+      <li><a href="#p8"><span>8교시</span>오프라인 수행평가와 학생 활동 기록</a></li>
+        <li><a href="#appendix"><span>부록</span>명령어, 템플릿, 참고 링크</a></li>
+    </ol>
+  </details>
+
+  <div class="layout">
+    <nav class="toc" aria-label="차례">
+      <p class="toc-title">차례</p>
+      <ol class="toc-list">
+        <li><a href="#p1"><span>1교시</span>Claude와 첫 만남</a></li>
+        <li><a href="#p2"><span>2교시</span>수업과 업무에 Claude 쓰기</a></li>
+        <li><a href="#p3"><span>3교시</span>설치 없이 해 보는 바이브 코딩</a></li>
+        <li><a href="#p4"><span>4교시</span>Claude Code 설치와 첫 세션</a></li>
+        <li><a href="#p5"><span>5교시</span>우리 반 퀴즈 앱 만들기</a></li>
+        <li><a href="#p6"><span>6교시</span>막힐 때 푸는 법과 좋은 습관</a></li>
+        <li><a href="#p7"><span>7교시</span>안전 수칙과 교실 적용 계획</a></li>
+        <li><a href="#p8"><span>8교시</span>오프라인 수행평가와 학생 활동 기록</a></li>
+        <li><a href="#appendix"><span>부록</span>명령어, 템플릿, 참고 링크</a></li>
+      </ol>
+    </nav>
+
+    <main class="content" id="main" tabindex="-1">
+
+      <section class="period" id="p1" aria-labelledby="p1-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">1</span><span class="u">교시</span></p>
+          <h2 id="p1-title"><span class="sr-only">1교시. </span>Claude와 첫 만남</h2>
+          <p class="period-meta">강의 25분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>Claude가 어떤 도구이고 어디에서 쓸 수 있는지 설명할 수 있다.</li>
+            <li>생성형 AI가 잘하는 일과 조심해야 할 일을 구분할 수 있다.</li>
+            <li>계정을 만들고 첫 대화를 시작할 수 있다.</li>
+          </ul>
+        </div>
+
+        <h3>Claude는 어떤 도구인가요</h3>
+        <p>Claude는 미국 AI 기업 Anthropic이 만든 AI 어시스턴트입니다. 사람에게 부탁하듯 문장으로 요청하면 글을 쓰고, 긴 자료를 요약하고, 표를 정리하고, 코드를 짭니다. 검색창에 낱말 몇 개를 넣을 때와 달리 누구를 위해, 무엇을, 어떤 모양으로 원하는지 자세히 말할수록 결과가 좋아집니다.</p>
+        <p class="pull">검색은 이미 있는 답을 찾아 주고, Claude는 내 상황에 맞는 초안을 새로 만들어 줍니다. 그래서 초안을 검토하고 고치는 일은 여전히 선생님 몫입니다.</p>
+
+        <h3>어디에서 쓸 수 있나요</h3>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">쓰는 곳</th><th scope="col">이럴 때 좋아요</th><th scope="col">이 연수에서</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">웹 claude.ai</th><td>설치 없이 바로 대화하고, 파일을 올리고, 결과물을 옆 창에서 확인</td><td>1~3교시</td></tr>
+              <tr><th scope="row">데스크톱·모바일 앱</th><td>웹과 같은 대화를 앱으로. 이동 중에는 휴대폰으로 확인</td><td>참고</td></tr>
+              <tr><th scope="row">Claude Code</th><td>내 컴퓨터 폴더 안에서 파일을 만들고 고치는 코딩 도구. 터미널이나 데스크톱 앱에서 사용</td><td>4~5교시</td></tr>
+              <tr><th scope="row">Claude Cowork</th><td>코딩이 아닌 문서 작업, 파일 정리 같은 일을 맡기는 데스크톱 앱</td><td>참고</td></tr>
+              <tr><th scope="row">업무 프로그램 안</th><td>Chrome, Excel, PowerPoint 안에서 바로 쓰는 Claude</td><td>참고</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">쓸 수 있는 곳은 요금제와 시기에 따라 다릅니다. 이 연수에서는 웹과 Claude Code만 다룹니다.</p>
+
+        <h3>요금제는 어떻게 다른가요</h3>
+        <p>무료 플랜으로도 대화, 파일 올리기, 간단한 결과물 만들기를 충분히 해 볼 수 있습니다. 더 많이 쓰거나 Claude Code를 쓰려면 Pro, Max 같은 개인 유료 플랜이나 Team, Enterprise 같은 기관용 플랜이 필요합니다. 가격과 사용 한도는 자주 바뀌므로 연수 당일 claude.ai의 요금제 화면을 함께 보며 확인하세요.</p>
+        <div class="note">
+          <p><strong class="label">기관 도입</strong>학교나 교육청 단위로 쓰려면 개인 결제보다 기관용 플랜의 계약 조건과 데이터 처리 방식을 먼저 검토하는 것이 좋습니다.</p>
+        </div>
+
+        <h3>잘하는 일, 조심할 일</h3>
+        <div class="two-col">
+          <div>
+            <h4>잘하는 일</h4>
+            <ul>
+              <li>초안 쓰기: 가정통신문, 수업 안내문, 활동지 문항</li>
+              <li>수준 바꾸기: 같은 내용을 초등 3학년 눈높이로, 또는 전문 용어로</li>
+              <li>정리하기: 긴 회의 자료를 요점과 표로</li>
+              <li>아이디어 내기: 수업 도입 활동, 모둠 과제 주제</li>
+              <li>코드 짜기: 타이머, 뽑기, 퀴즈 같은 작은 웹 도구</li>
+            </ul>
+          </div>
+          <div>
+            <h4><span class="star-mark" aria-hidden="true"><svg viewBox="-1 -1 26 26" focusable="false"><g transform="translate(1.3 1.1) rotate(7 12 12.6)"><polygon class="hl" points="12,2.1 14.59,9.04 21.99,9.36 16.18,13.96 18.17,21.1 12,17 5.83,21.1 7.82,13.96 2.01,9.36 9.41,9.04"/></g><path class="pen" pathLength="1" d="M12.2 2.4 17.7 20.4 2.7 9.5 21.4 9.3 6.2 20.7 12.9 1.5"/></svg></span>조심할 일</h4>
+            <ul class="star-list">
+              <li>그럴듯한 오류: 없는 자료나 틀린 사실을 자신 있게 말할 수 있습니다. 이를 환각이라고 부릅니다.</li>
+              <li>최신 정보: 학습 시점 이후의 소식은 웹 검색을 켜야 반영됩니다.</li>
+              <li>정답과 계산: 정답표, 풀이, 채점 기준은 사람이 반드시 확인합니다.</li>
+              <li>개인정보: 학생 이름, 성적, 상담 내용은 입력하지 않습니다.</li>
+              <li>판단의 책임: 평가와 생활지도 결정은 교사가 내립니다.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>계정 만들고 첫 대화 보내기</h3>
+        <ol class="steps">
+          <li>
+            <h4>claude.ai에 접속합니다</h4>
+            <p>브라우저 주소창에 claude.ai를 입력합니다. 휴대폰이라면 앱 스토어에서 Claude를 검색하고, 만든 회사가 Anthropic인지 확인한 뒤 설치합니다.</p>
+          </li>
+          <li>
+            <h4>가입하고 로그인합니다</h4>
+            <p>Google 계정이나 이메일 주소로 가입합니다. 이메일로 가입했다면 받은 편지함에 온 안내를 따라 로그인합니다. Claude 계정은 만 18세 이상만 만들고 쓸 수 있습니다.</p>
+          </li>
+          <li>
+            <h4>첫 대화를 보냅니다</h4>
+            <p>입력창에 아래 문장을 붙여넣고, 형광펜 부분을 선생님 상황에 맞게 바꿔 보냅니다.</p>
+            <figure class="prompt">
+              <figcaption class="fig-bar"><span>첫 요청</span><button class="copy" type="button">복사</button></figcaption>
+              <pre>안녕하세요. 저는 <mark>[초등학교 5학년 담임]</mark>입니다. 교사의 수업 준비와 업무에서 Claude가 도울 수 있는 일을 5가지만 알려 주세요. 각각 우리 반에서 바로 써 볼 수 있는 한 문장 예시를 붙여 주세요.</pre>
+            </figure>
+          </li>
+          <li>
+            <h4>이어서 요청합니다</h4>
+            <p>답을 받으면 "3번을 더 자세히 알려 주세요"처럼 대화를 이어 갑니다. 주제가 바뀌면 새 대화를 여는 편이 결과가 깔끔합니다.</p>
+          </li>
+        </ol>
+        <div class="note">
+          <p><strong class="label">강사 도움말</strong>이 교시의 목표는 모든 참여자가 첫 요청을 직접 보내 보는 것입니다. 계정이 아직 없는 분은 옆 사람 화면을 함께 보고, 쉬는 시간에 가입을 마치도록 안내하세요.</p>
+        </div>
+      </section>
+
+      <section class="period" id="p2" aria-labelledby="p2-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">2</span><span class="u">교시</span></p>
+          <h2 id="p2-title"><span class="sr-only">2교시. </span>수업과 업무에 Claude 쓰기</h2>
+          <p class="period-meta">강의와 실습 35분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>좋은 요청의 네 가지 재료를 넣어 프롬프트를 쓸 수 있다.</li>
+            <li>첫 결과를 대화로 다듬어 원하는 결과물에 가깝게 만들 수 있다.</li>
+            <li>파일 올리기, 프로젝트 같은 기능을 업무에 맞게 고를 수 있다.</li>
+          </ul>
+        </div>
+
+        <h3>좋은 요청의 네 가지 재료</h3>
+        <p>Claude는 선생님 반 학생들의 수준도, 원하는 분량도 모릅니다. 새로 온 유능한 보조 교사에게 일을 부탁한다고 생각하고 아래 네 가지를 문장에 담아 보세요. 이렇게 AI에게 보내는 요청 문장을 프롬프트라고 부릅니다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">재료</th><th scope="col">스스로 묻기</th><th scope="col">예</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">상황</th><td>누가, 누구를 위해 쓰나요?</td><td>중학교 2학년 과학, 기초 학력 차이가 큰 28명</td></tr>
+              <tr><th scope="row">할 일</th><td>무엇을 만들어야 하나요?</td><td>광합성 단원 형성 평가 문항</td></tr>
+              <tr><th scope="row">조건</th><td>분량, 수준, 형식, 하지 말 것은?</td><td>객관식 5문항, 정답과 해설은 표로</td></tr>
+              <tr><th scope="row">예시</th><td>원하는 모습을 보여 줄 수 있나요?</td><td>지난 시간 문항 하나를 붙이고 "이런 느낌으로"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>같은 부탁, 다른 결과</h3>
+        <div class="compare">
+          <figure class="prompt prompt-weak">
+            <figcaption class="fig-bar"><span>재료가 빠진 요청</span></figcaption>
+            <pre>광합성 문제 만들어 줘.</pre>
+          </figure>
+          <figure class="prompt">
+            <figcaption class="fig-bar"><span>네 가지 재료를 넣은 요청</span><button class="copy" type="button">복사</button></figcaption>
+            <pre>저는 <mark>[중학교 2학년 과학]</mark> 교사입니다. <mark>[광합성]</mark> 단원을 마치고 수업 마지막 10분에 풀 형성 평가를 만들려고 합니다.
+
+- 객관식 <mark>[5]</mark>문항, 보기는 4개
+- 오답 보기는 학생들이 흔히 가지는 오개념으로 구성
+- 문장은 짧고 쉽게, 한 문항에 개념 하나만
+- 마지막에 정답, 해설, 관련 오개념을 표로 정리
+
+문항을 만들기 전에, 이 단원에서 학생들이 자주 가지는 오개념 3가지를 먼저 알려 주세요.</pre>
+          </figure>
+        </div>
+        <p>두 번째 요청은 길지만 다시 고쳐 달라고 할 일이 줄어 결국 더 빠릅니다. 마지막 줄처럼 먼저 생각을 보여 달라고 하면, Claude가 방향을 잘못 잡았을 때 일찍 바로잡을 수 있습니다.</p>
+
+        <h3>한 번에 끝내지 말고 대화로 다듬기</h3>
+        <p>첫 답이 아쉬워도 처음부터 다시 쓸 필요는 없습니다. 무엇이 아쉬운지 구체적으로 말하면 그 부분만 고쳐 줍니다.</p>
+        <ul class="quotes">
+          <li>3번 문항은 너무 쉬워요. 개념 두 개를 연결해야 풀 수 있게 바꿔 주세요.</li>
+          <li>보기 문장이 길어서 읽기 부담스러워요. 모든 보기를 15자 안쪽으로 줄여 주세요.</li>
+          <li>읽기가 어려운 학생을 위해 같은 내용으로 3문항만, 더 쉬운 낱말로 다시 만들어 주세요.</li>
+          <li>해설을 학생에게 바로 보여 줄 수 있게 친절한 말투로 바꿔 주세요.</li>
+        </ul>
+
+        <h3><span class="star-mark" aria-hidden="true"><svg viewBox="-1 -1 26 26" focusable="false"><g transform="translate(1.3 1.1) rotate(7 12 12.6)"><polygon class="hl" points="12,2.1 14.59,9.04 21.99,9.36 16.18,13.96 18.17,21.1 12,17 5.83,21.1 7.82,13.96 2.01,9.36 9.41,9.04"/></g><path class="pen" pathLength="1" d="M12.2 2.4 17.7 20.4 2.7 9.5 21.4 9.3 6.2 20.7 12.9 1.5"/></svg></span>수업과 업무에서 이렇게 씁니다</h3>
+        <dl class="ideas star-ideas">
+          <div><dt>수업 준비</dt><dd>수준별 읽기 자료, 발문 목록, 도입 활동 아이디어, 학습지 초안</dd></div>
+          <div><dt>평가</dt><dd>루브릭 초안, 서술형 채점 기준 예시, 문항 속 오류와 모호한 표현 찾기</dd></div>
+          <div><dt>학급 운영</dt><dd>학급 행사 계획, 1인 1역 목록, 학부모 안내문 초안</dd></div>
+          <div><dt>행정 업무</dt><dd>긴 공문 요약, 회의록 정리, 계획서 목차와 초안</dd></div>
+          <div><dt>수업 도구</dt><dd>타이머, 모둠 뽑기, 퀴즈 같은 작은 웹 도구 (3교시부터)</dd></div>
+          <div><dt>교사의 공부</dt><dd>새 교육과정 용어 풀이, 연수 내용 정리, 외국 논문 요약</dd></div>
+        </dl>
+        <div class="note note-pen">
+          <p><strong class="label">주의</strong>생활기록부 문구나 상담 기록처럼 학생 개인에 관한 글은, 이름을 빼더라도 먼저 학교와 교육청 지침을 확인하세요. 평가와 기록의 최종 책임은 교사에게 있습니다.</p>
+        </div>
+
+        <h3>알아 두면 좋은 기능</h3>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">기능</th><th scope="col">하는 일</th><th scope="col">활용 예</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">파일 올리기</th><td>PDF, 이미지, 문서를 올리고 그 내용을 바탕으로 답하게 합니다.</td><td>직접 만든 학습지를 올리고 문항 검토 요청</td></tr>
+              <tr><th scope="row">프로젝트</th><td>자료와 지침을 묶어 두고 여러 대화에서 함께 씁니다.</td><td>"2학기 과학" 프로젝트에 단원 계획과 말투 지침 저장</td></tr>
+              <tr><th scope="row">아티팩트</th><td>문서, 표, 웹 도구를 대화 옆 창에 결과물로 만듭니다.</td><td>3교시 바이브 코딩 실습</td></tr>
+              <tr><th scope="row">웹 검색</th><td>최신 정보를 찾아 출처와 함께 답합니다.</td><td>올해 바뀐 제도나 행사 일정 확인</td></tr>
+              <tr><th scope="row">스타일</th><td>답의 말투와 형식을 정해 둡니다.</td><td>늘 짧은 개조식으로 받기</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">메뉴 이름과 제공 범위는 요금제와 시기에 따라 다를 수 있고, 설정 화면에서 켜고 끄는 기능도 있습니다.</p>
+
+        <h3>실습: 요청문 만들기 도우미</h3>
+        <p>10분 실습입니다. 칸을 채우면 네 가지 재료가 들어간 요청문이 만들어집니다. 복사해서 Claude에 보내고, 받은 결과를 한 번 이상 대화로 다듬어 보세요.</p>
+        <div class="builder" id="builder">
+          <div class="builder-fields">
+            <label class="field"><span>학교급과 학년</span><input id="b-grade" type="text" autocomplete="off" placeholder="예: 초등학교 4학년"></label>
+            <label class="field"><span>과목과 단원</span><input id="b-unit" type="text" autocomplete="off" placeholder="예: 사회, 우리 지역의 문화유산"></label>
+            <label class="field"><span>만들 것</span>
+              <select id="b-task">
+                <option value="quiz">형성 평가 문항</option>
+                <option value="reading">수준별 읽기 자료</option>
+                <option value="opening">수업 도입 활동</option>
+                <option value="discussion">모둠 토의 질문</option>
+                <option value="rubric">채점 기준표(루브릭)</option>
+                <option value="letter">가정통신문 초안</option>
+              </select>
+            </label>
+            <label class="field"><span>학생 상황 (선택)</span><textarea id="b-class" rows="2" placeholder="예: 읽기 속도 차이가 크고 모둠 활동을 좋아함"></textarea></label>
+            <label class="field"><span>조건 (한 줄에 하나, 비워 두면 기본 조건)</span><textarea id="b-cond" rows="3" placeholder="예: 10분 안에 끝나는 분량&#10;결과는 표로 정리"></textarea></label>
+          </div>
+          <div class="builder-out">
+            <figure class="prompt">
+              <figcaption class="fig-bar"><span>만들어진 요청문</span><button class="copy" type="button">복사</button></figcaption>
+              <pre id="b-output">저는 교사이고, 아래 내용으로 형성 평가 문항을 만들려고 합니다.
+
+학년: [학교급과 학년]
+과목과 단원: [과목과 단원]
+
+조건:
+- 객관식 5문항, 보기는 4개
+- 오답 보기는 학생들이 흔히 가지는 오개념으로 구성
+- 마지막에 정답과 해설을 표로 정리
+
+만들기 전에 더 알아야 할 점이 있으면 먼저 질문해 주세요.</pre>
+            </figure>
+            <p class="small">입력한 내용은 이 화면에서만 쓰이고 어디로도 전송되지 않습니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="period" id="p3" aria-labelledby="p3-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">3</span><span class="u">교시</span></p>
+          <h2 id="p3-title"><span class="sr-only">3교시. </span>설치 없이 해 보는 바이브 코딩</h2>
+          <p class="period-meta">실습 30분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>바이브 코딩이 무엇인지 설명할 수 있다.</li>
+            <li>말하기, 확인하기, 고치기를 반복해 간단한 수업 도구를 만들 수 있다.</li>
+            <li>결과물의 문제를 구체적인 말로 피드백할 수 있다.</li>
+          </ul>
+        </div>
+
+        <h3>바이브 코딩이란</h3>
+        <p>바이브 코딩은 코드를 한 줄씩 직접 쓰는 대신, 만들고 싶은 것을 말로 설명하고 AI가 만든 결과를 실행해 보며 고쳐 나가는 방식입니다. 2025년 초 AI 연구자 안드레이 카파시(Andrej Karpathy)가 쓴 표현이 널리 퍼졌습니다. 코드를 읽지 못해도 시작할 수 있지만, 결과가 의도대로 동작하는지 따져 보는 눈은 꼭 필요합니다.</p>
+        <p class="pull">선생님이 할 일은 코드를 쓰는 것이 아니라, 무엇이 필요한지 분명히 말하고 결과를 학생의 눈으로 점검하는 것입니다. 수업을 설계하고 다듬는 일과 크게 다르지 않습니다.</p>
+
+        <h3>세 가지를 반복합니다</h3>
+        <ul class="lead-list">
+          <li><strong>말하기.</strong> 누가, 어디서, 무엇을 하려는 도구인지와 꼭 필요한 기능을 설명합니다.</li>
+          <li><strong>확인하기.</strong> 결과물을 직접 눌러 보고, 학생이 쓴다고 생각하며 이것저것 해 봅니다.</li>
+          <li><strong>고치기.</strong> 무엇을 했더니 어떻게 됐고 원래는 어떻게 되어야 하는지 말합니다. 그리고 다시 확인합니다.</li>
+        </ul>
+
+        <h3>실습: 모둠 뽑기 도구 만들기</h3>
+        <p>claude.ai에서 새 대화를 열고 아래 요청을 보냅니다. 화면 오른쪽(휴대폰은 아래)에 결과물 창이 열리고 도구가 나타나면 성공입니다. 결과물 창이 열리지 않으면 "아티팩트로 만들어 주세요"라고 덧붙이세요.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>도구 만들기 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>교실 TV에 띄워 쓸 모둠 뽑기 웹 도구를 만들어 주세요.
+
+- 학생 번호나 이름을 한 줄에 하나씩 붙여넣는 칸
+- 모둠당 인원(2~6명)을 고르는 메뉴
+- "모둠 뽑기" 버튼을 누르면 무작위로 모둠을 나눠 큰 글씨로 보여 주기
+- 인원이 딱 나누어떨어지지 않으면 남는 학생을 앞 모둠부터 한 명씩 더하기
+- 교실 뒤에서도 읽히는 큰 글씨, 한국어 화면</pre>
+        </figure>
+        <div class="note note-pen">
+          <p><strong class="label">개인정보</strong>학생 실명 명단은 대화창에 붙여넣지 마세요. 도구를 만드는 데 이름은 필요 없습니다. 실습에서는 완성된 도구에 1번, 2번 같은 번호를 넣어 확인합니다.</p>
+        </div>
+
+        <h3>확인하고 고치기</h3>
+        <p>도구가 나오면 번호를 넣고 여러 번 눌러 봅니다. 29명처럼 나누어떨어지지 않는 인원도 꼭 넣어 보세요. 문제를 발견했을 때 피드백은 이렇게 달라질 수 있습니다.</p>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">막연한 피드백</th><th scope="col">구체적인 피드백</th></tr></thead>
+            <tbody>
+              <tr><td>이상해요.</td><td>29명을 4명씩 나눴더니 마지막 모둠에 1명만 있어요. 남는 학생은 앞 모둠부터 한 명씩 더해 주세요.</td></tr>
+              <tr><td>글씨가 별로예요.</td><td>교실 뒤에서 모둠 이름이 안 보여요. 모둠 이름은 지금보다 두 배 크게, 번호는 굵게 해 주세요.</td></tr>
+              <tr><td>좀 더 재미있게요.</td><td>버튼을 누르면 2초 동안 번호가 빠르게 섞이다가 멈추는 효과를 넣어 주세요. 소리는 넣지 마세요.</td></tr>
+              <tr><td>다시 해 주세요.</td><td>다시 뽑을 때 직전과 똑같은 모둠 구성이 나오지 않게 해 주세요.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>좋은 피드백에는 <mark>무엇을 했더니, 어떻게 됐고, 원래는 어떻게 되어야 하는지</mark>가 들어 있습니다. 이 공식은 5교시 Claude Code에서도 똑같이 씁니다.</p>
+
+        <h3>시간이 남으면 만들어 볼 것</h3>
+        <dl class="ideas">
+          <div><dt>수업 타이머</dt><dd>분 단위로 맞추고, 끝나기 1분 전에 배경색이 바뀌는 전체 화면 타이머</dd></div>
+          <div><dt>발표 순서 돌림판</dt><dd>번호를 넣으면 돌림판이 돌아 한 명씩 뽑고, 뽑힌 번호는 빼기</dd></div>
+          <div><dt>소음 신호등</dt><dd>교사가 누를 때마다 초록, 노랑, 빨강으로 바뀌는 큰 표시판</dd></div>
+          <div><dt>구구단 연습기</dt><dd>무작위 문제, 맞힌 개수 세기, 틀린 문제만 다시 풀기</dd></div>
+          <div><dt>낱말 카드</dt><dd>앞면은 낱말, 뒷면은 뜻. 넘기기와 섞기 버튼</dd></div>
+          <div><dt>1인 1역 순환표</dt><dd>번호와 역할을 넣으면 주마다 한 칸씩 돌아가는 표</dd></div>
+        </dl>
+
+        <h3>채팅으로 만든 도구의 한계</h3>
+        <p>채팅에서 만든 도구는 아이디어를 빠르게 시험해 보기에 좋습니다. 결과물을 링크로 공유하거나 파일로 내려받을 수도 있지만, 제공 방식은 요금제와 설정에 따라 다릅니다. 도구가 커질수록 긴 코드를 대화 안에서 계속 고치기 번거로워지고, 여러 파일로 나누어 보관하기도 어렵습니다. 이때 내 컴퓨터 폴더에서 파일을 직접 만들고 고치는 Claude Code가 필요합니다.</p>
+      </section>
+
+      <section class="period" id="p4" aria-labelledby="p4-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">4</span><span class="u">교시</span></p>
+          <h2 id="p4-title"><span class="sr-only">4교시. </span>Claude Code 설치와 첫 세션</h2>
+          <p class="period-meta">실습 30분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>채팅과 Claude Code의 차이를 설명할 수 있다.</li>
+            <li>운영체제에 맞게 Claude Code를 설치하고 로그인할 수 있다.</li>
+            <li>연습 폴더에서 첫 파일을 만들고, 권한 요청을 읽고 판단할 수 있다.</li>
+          </ul>
+        </div>
+
+        <h3>채팅과 무엇이 다른가요</h3>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">비교</th><th scope="col">채팅 (claude.ai)</th><th scope="col">Claude Code</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">결과물이 생기는 곳</th><td>대화 옆 결과물 창</td><td>내 컴퓨터 폴더 안의 실제 파일</td></tr>
+              <tr><th scope="row">고치는 방식</th><td>대화 안에서 결과물을 고쳐 다시 보여 줌</td><td>필요한 파일의 필요한 부분만 수정</td></tr>
+              <tr><th scope="row">할 수 있는 일</th><td>대화, 한 화면짜리 결과물</td><td>여러 파일 읽고 쓰기, 명령 실행, 오류 확인</td></tr>
+              <tr><th scope="row">안전장치</th><td>대화 안에서만 동작</td><td>파일을 바꾸거나 명령을 실행하기 전에 허락을 구함</td></tr>
+              <tr><th scope="row">필요한 것</th><td>브라우저, 무료 계정도 가능</td><td>설치, 유료 플랜 또는 Console 계정</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>채팅이 옆에서 조언해 주는 동료라면, Claude Code는 내 컴퓨터 앞에 앉아 직접 작업하는 보조 교사에 가깝습니다. 그래서 <mark>어느 폴더에서 일을 맡기는지, 무엇을 허락하는지</mark>가 중요합니다.</p>
+
+        <h3>준비물</h3>
+        <ul>
+          <li>Pro, Max, Team, Enterprise 플랜 계정 또는 Claude Console 계정. 무료 플랜으로는 Claude Code를 쓸 수 없습니다.</li>
+          <li>macOS 13 이상 또는 Windows 10(1809) 이상, 메모리 4GB 이상인 컴퓨터와 인터넷 연결</li>
+          <li>프로그램 설치 권한. 관리자 권한은 필요 없지만, 학교 PC는 보안 프로그램 때문에 막힐 수 있으니 미리 확인합니다.</li>
+        </ul>
+        <div class="note">
+          <p><strong class="label">터미널이 부담스럽다면</strong>Claude 데스크톱 앱에서도 터미널 없이 Claude Code를 쓸 수 있습니다. 이 자료는 macOS와 Windows에서 같은 순서로 따라 할 수 있는 터미널 방식으로 설명하고, 데스크톱 앱 사용법은 부록의 공식 안내 링크로 대신합니다.</p>
+        </div>
+
+        <h3>터미널 열기</h3>
+        <p>터미널은 마우스 대신 글자로 컴퓨터에 일을 시키는 창입니다. 이 연수에서는 명령어를 외울 필요 없이 복사해 붙여넣고 <kbd>Enter</kbd>만 누르면 됩니다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">운영체제</th><th scope="col">여는 방법</th><th scope="col">붙여넣기</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">macOS</th><td><kbd>⌘</kbd>+<kbd>Space</kbd>로 Spotlight를 열고 "터미널" 입력</td><td><kbd>⌘</kbd>+<kbd>V</kbd></td></tr>
+              <tr><th scope="row">Windows</th><td>시작 버튼을 누르고 "PowerShell" 입력</td><td><kbd>Ctrl</kbd>+<kbd>V</kbd> 또는 마우스 오른쪽 클릭</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>설치하기</h3>
+        <div class="tabs">
+          <div class="tablist" role="tablist" aria-label="운영체제별 설치 방법">
+            <button type="button" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="true" data-os="mac">macOS</button>
+            <button type="button" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="false" tabindex="-1" data-os="win">Windows</button>
+            <button type="button" role="tab" id="tab-etc" aria-controls="panel-etc" aria-selected="false" tabindex="-1">다른 방법</button>
+          </div>
+          <div role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0">
+            <p class="panel-label">macOS</p>
+            <p>터미널에 아래 명령을 붙여넣고 <kbd>Enter</kbd>를 누릅니다. 설치가 끝나면 터미널 창을 닫고 새로 엽니다.</p>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>macOS 터미널</span><button class="copy" type="button">복사</button></figcaption>
+              <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+            </figure>
+          </div>
+          <div role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+            <p class="panel-label">Windows</p>
+            <p>PowerShell에 아래 명령을 붙여넣고 <kbd>Enter</kbd>를 누릅니다. 관리자 권한으로 열 필요는 없습니다. 설치가 끝나면 PowerShell 창을 닫고 새로 엽니다.</p>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>Windows PowerShell</span><button class="copy" type="button">복사</button></figcaption>
+              <pre><code>irm https://claude.ai/install.ps1 | iex</code></pre>
+            </figure>
+            <p class="small">줄 앞에 PS가 보이면 PowerShell이 맞습니다. Git for Windows는 선택 사항입니다. 없으면 Claude Code가 PowerShell로 명령을 실행하므로 이 연수에서는 설치하지 않아도 됩니다.</p>
+          </div>
+          <div role="tabpanel" id="panel-etc" aria-labelledby="tab-etc" tabindex="0">
+            <p class="panel-label">다른 방법</p>
+            <p>평소 패키지 관리자를 쓰는 분은 아래 방법으로도 설치할 수 있습니다. 이 방식은 자동으로 업데이트되지 않으므로 가끔 직접 업데이트해야 합니다.</p>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>macOS Homebrew</span><button class="copy" type="button">복사</button></figcaption>
+              <pre><code>brew install --cask claude-code</code></pre>
+            </figure>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>Windows WinGet</span><button class="copy" type="button">복사</button></figcaption>
+              <pre><code>winget install Anthropic.ClaudeCode</code></pre>
+            </figure>
+          </div>
+        </div>
+        <p>설치가 잘 됐는지 확인합니다. 버전 번호가 나오면 성공입니다.</p>
+        <figure class="board">
+          <figcaption class="fig-bar"><span>설치 확인 (macOS, Windows 공통)</span><button class="copy" type="button">복사</button></figcaption>
+          <pre><code>claude --version</code></pre>
+        </figure>
+        <div class="note note-pen">
+          <p><strong class="label">명령어 출처</strong>설치 명령은 바뀔 수 있습니다. 연수 전날 부록의 공식 설치 안내에서 한 번 더 확인하고, 출처가 분명하지 않은 블로그나 영상 속 설치 명령은 실행하지 마세요.</p>
+        </div>
+
+        <h3>첫 세션 시작하기</h3>
+        <ol class="steps">
+          <li>
+            <h4>연습 폴더를 만들고 들어갑니다</h4>
+            <p>중요한 파일이 없는 빈 폴더에서 시작해야 안전합니다. 아래 명령은 사용자 폴더 안에 quiz-app 폴더를 만들고 그 안으로 들어갑니다. macOS와 Windows에서 똑같이 쓸 수 있습니다.</p>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>터미널</span><button class="copy" type="button">복사</button></figcaption>
+              <pre class="soft"><code>cd ~; mkdir quiz-app; cd quiz-app</code></pre>
+            </figure>
+            <p class="small">이 폴더를 파인더나 파일 탐색기 창으로 보고 싶으면 macOS는 <code>open .</code>, Windows는 <code>explorer .</code>를 입력합니다.</p>
+          </li>
+          <li>
+            <h4>Claude Code를 실행합니다</h4>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>터미널</span><button class="copy" type="button">복사</button></figcaption>
+              <pre><code>claude</code></pre>
+            </figure>
+            <p>처음 실행하면 화면 테마 고르기와 로그인 안내가 차례로 나옵니다. 방향키로 고르고 <kbd>Enter</kbd>를 누릅니다. 로그인 방식에서 요금제 계정을 고르면 브라우저가 열리고, 승인하면 터미널로 돌아옵니다. 순서와 문구는 버전에 따라 조금 다를 수 있습니다.</p>
+          </li>
+          <li>
+            <h4>이 폴더를 믿을지 답합니다</h4>
+            <p>이 폴더의 파일로 작업해도 되는지 묻는 질문이 나옵니다. 방금 만든 연습 폴더이므로 허용합니다. 내 문서 폴더 전체나 바탕화면처럼 중요한 파일이 섞인 곳에서 이 질문이 나왔다면 여기서 멈추고 연습 폴더로 옮기세요.</p>
+          </li>
+          <li>
+            <h4>첫 요청을 보냅니다</h4>
+            <figure class="prompt">
+              <figcaption class="fig-bar"><span>Claude Code에 보내는 첫 요청</span><button class="copy" type="button">복사</button></figcaption>
+              <pre>이 폴더에 hello.html 파일을 만들어 주세요. 화면 가운데에 "<mark>[3학년 2반]</mark> 친구들, 반가워요!"를 크게 보여 주고, 버튼을 누르면 오늘 날짜가 나타나게 해 주세요.</pre>
+            </figure>
+          </li>
+          <li>
+            <h4>권한 요청을 읽고 허락합니다</h4>
+            <p>Claude는 파일을 만들기 전에 어떤 파일에 무엇을 쓸지 보여 주고 허락을 구합니다. 파일 이름과 내용을 훑어보고 Yes를 고릅니다. 거절하려면 <kbd>Esc</kbd>를 누릅니다. 이번 세션 동안 계속 허락하는 선택지도 있지만, 처음에는 한 번씩 확인하는 습관을 들이세요.</p>
+          </li>
+          <li>
+            <h4>결과를 확인합니다</h4>
+            <p>연습 폴더를 열고 hello.html을 더블클릭하면 브라우저에서 열립니다. 버튼을 눌러 보고, 고칠 점이 있으면 터미널에 말로 적어 보냅니다. "hello.html을 브라우저로 열어 주세요"라고 부탁해도 되는데, 이때는 명령을 실행해도 되는지 묻습니다.</p>
+          </li>
+          <li>
+            <h4>끝내고, 다음에 이어 갑니다</h4>
+            <p><code>/exit</code>를 입력하면 끝납니다. 나중에 같은 폴더에서 <code>claude --continue</code>를 입력하면 직전 대화를 이어 갈 수 있습니다.</p>
+          </li>
+        </ol>
+
+        <h3>꼭 알아 둘 키</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">키</th><th scope="col">하는 일</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><kbd>Esc</kbd></th><td>Claude가 작업하는 도중에 멈춥니다. 방향이 틀렸다 싶으면 바로 누르고 다시 설명하세요.</td></tr>
+              <tr><th scope="row"><kbd>Esc</kbd> 두 번</th><td>입력창이 비어 있을 때 누르면 되돌리기 메뉴가 열려 이전 시점의 대화와 코드로 돌아갈 수 있습니다.</td></tr>
+              <tr><th scope="row"><kbd>Shift</kbd>+<kbd>Tab</kbd></th><td>작업 방식을 바꿉니다. 매번 확인, 파일 수정 자동 허락, 계획 모드 순서로 돌아갑니다.</td></tr>
+              <tr><th scope="row"><kbd>Shift</kbd>+<kbd>Enter</kbd></th><td>보내지 않고 줄을 바꿉니다. 안 되는 터미널에서는 <kbd>\</kbd>를 입력한 뒤 <kbd>Enter</kbd>를 누릅니다.</td></tr>
+              <tr><th scope="row"><kbd>/</kbd></th><td>명령어 목록을 봅니다. 자주 쓰는 명령은 부록에 정리했습니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <p><strong class="label">계획 모드</strong>계획 모드에서는 파일을 바꾸지 않고 무엇을 어떻게 할지 계획만 세웁니다. 5교시는 이 모드로 시작합니다.</p>
+        </div>
+      </section>
+
+      <section class="period" id="p5" aria-labelledby="p5-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">5</span><span class="u">교시</span></p>
+          <h2 id="p5-title"><span class="sr-only">5교시. </span>우리 반 퀴즈 앱 만들기</h2>
+          <p class="period-meta">실습 50분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>만들 도구를 쓰는 사람, 장소, 기능 단위로 기획할 수 있다.</li>
+            <li>CLAUDE.md에 프로젝트 규칙을 적어 두고 활용할 수 있다.</li>
+            <li>계획, 구현, 확인, 수정 순서로 퀴즈 앱을 완성하고 보관할 수 있다.</li>
+          </ul>
+        </div>
+        <p>4교시에 만든 quiz-app 폴더에서 수업 마무리용 퀴즈 앱을 완성합니다. 아래 시간 배분을 기준으로 하되, 확인하고 고치는 데 가장 많은 시간을 쓰세요.</p>
+        <div class="table-wrap">
+          <table class="timetable">
+            <thead><tr><th scope="col">순서</th><th scope="col">할 일</th><th scope="col">시간</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><a href="#s1">1</a></th><td>기획 메모 쓰기</td><td>7분</td></tr>
+              <tr><th scope="row"><a href="#s2">2</a></th><td>CLAUDE.md에 규칙 적기</td><td>5분</td></tr>
+              <tr><th scope="row"><a href="#s3">3</a></th><td>계획부터 세우게 하기</td><td>5분</td></tr>
+              <tr><th scope="row"><a href="#s4">4</a></th><td>첫 버전 만들기</td><td>8분</td></tr>
+              <tr><th scope="row"><a href="#s5">5</a></th><td>학생 입장에서 확인하기</td><td>10분</td></tr>
+              <tr><th scope="row"><a href="#s6">6</a></th><td>고치고 기능 더하기</td><td>10분</td></tr>
+              <tr><th scope="row"><a href="#s7">7</a></th><td>보관하고 나누기</td><td>5분</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="s1">1. 기획 메모 쓰기</h3>
+        <p>코드를 부탁하기 전에 메모장에 네 줄을 적습니다. 이 메모가 그대로 좋은 요청이 됩니다.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>기획 메모 틀</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>누가 쓰나요: <mark>[5학년 학생들이 모둠별로]</mark>
+어디서 쓰나요: <mark>[교실 TV 화면에 띄워서]</mark>
+꼭 필요한 기능 3가지: <mark>[문제 보여 주기, 바로 정답 확인, 맞힌 개수]</mark>
+이번에는 안 할 것: <mark>[로그인, 순위 저장, 인터넷 연결]</mark></pre>
+        </figure>
+        <p>이번에는 안 할 것을 적어 두면 기능이 욕심껏 붙어 앱이 복잡해지는 것을 막을 수 있습니다. 작게 완성한 뒤 하나씩 더하는 편이 훨씬 빠릅니다.</p>
+
+        <h3 id="s2">2. CLAUDE.md에 규칙 적기</h3>
+        <p>CLAUDE.md는 Claude Code가 이 폴더에서 작업을 시작할 때마다 먼저 읽는 메모 파일입니다. 매번 말하기 번거로운 규칙을 적어 두면 새 대화를 시작해도 지켜집니다. 아래 요청을 Claude Code 입력창에 붙여넣어 보내면 파일을 만들어 줍니다. 여러 줄도 한 번에 붙여넣을 수 있습니다.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>CLAUDE.md 만들기 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>이 폴더에 CLAUDE.md 파일을 아래 내용으로 만들어 주세요.
+
+# 우리 반 퀴즈 앱 규칙
+- 사용자는 <mark>[초등학교 5학년]</mark> 학생이고, 교실 TV 화면에 띄워서 씁니다.
+- 화면 문구는 모두 한국어로, 학생이 바로 이해하는 쉬운 말로 씁니다.
+- 설치나 인터넷 연결 없이 index.html을 더블클릭하면 동작해야 합니다.
+- 외부 사이트의 이미지, 글꼴, 라이브러리를 쓰지 않습니다.
+- 학생 이름이나 점수 같은 정보를 저장하거나 밖으로 보내지 않습니다.
+- 문제는 questions.js 파일에만 두어, 교사가 문제만 쉽게 바꿀 수 있게 합니다.
+- 큰 변경을 하기 전에는 무엇을 바꿀지 먼저 설명합니다.
+- 답변은 한국어로, 코드를 모르는 교사도 이해할 수 있게 설명합니다.</pre>
+        </figure>
+        <p class="small">규칙은 언제든 고칠 수 있습니다. 이미 코드가 있는 폴더라면 <code>/init</code> 명령으로 폴더를 분석해 CLAUDE.md 초안을 자동으로 만들 수도 있습니다.</p>
+
+        <h3 id="s3">3. 계획부터 세우게 하기</h3>
+        <p><kbd>Shift</kbd>+<kbd>Tab</kbd>을 몇 번 눌러 화면 아래에 계획 모드 표시가 나타나면 아래 요청을 보냅니다.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>계획 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>수업 마무리 5분에 쓸 퀴즈 앱을 만들고 싶어요. 아직 파일은 만들지 말고 계획만 세워 주세요.
+
+- 한 화면에 한 문제씩, 보기 4개 중 하나를 누르면 바로 정답인지 알려 주기
+- 틀리면 정답과 짧은 해설 보여 주기
+- 마지막 화면에 맞힌 개수와 "다시 풀기" 버튼
+- 예시 문제는 <mark>[사회, 우리 지역의 문화유산]</mark> 단원으로 <mark>[5]</mark>문항
+
+어떤 파일을 만들지, 화면이 어떤 순서로 바뀌는지, 제가 확인할 점이 무엇인지 알려 주세요.</pre>
+        </figure>
+        <p>계획을 읽고 바꾸고 싶은 점은 이 단계에서 말합니다. "해설은 맞혔을 때도 보여 주세요", "보기 순서는 풀 때마다 섞어 주세요"처럼요.</p>
+
+        <h3 id="s4">4. 첫 버전 만들기</h3>
+        <p>계획이 마음에 들면 진행할지 묻는 선택지에서 승인합니다. 파일 수정은 한 번씩 확인하는 방식을 고르세요. 선택지 없이 계획 모드를 빠져나왔다면 아래처럼 요청합니다.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>만들기 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>좋아요. 계획대로 만들어 주세요. 다 만들면 index.html을 여는 방법과, 제가 확인할 순서를 알려 주세요.</pre>
+        </figure>
+        <p>권한 요청이 나오면 만들려는 파일 이름이 계획과 같은지 보고 허락합니다. 작업이 끝나면 폴더에 index.html, questions.js 같은 파일이 생깁니다. 파일 이름은 계획에 따라 조금 다를 수 있습니다.</p>
+
+        <h3 id="s5">5. 학생 입장에서 확인하기</h3>
+        <p>확인은 코드를 몰라도 할 수 있고, 반드시 사람이 해야 하는 일입니다. 브라우저에서 앱을 열고 하나씩 점검하세요. 체크한 항목은 이 브라우저에만 저장됩니다.</p>
+        <ul class="checklist" data-key="quiz-check" data-progress="quiz-progress">
+          <li><label><input type="checkbox"><span>index.html을 더블클릭하면 첫 화면이 제대로 보인다.</span></label></li>
+          <li><label><input type="checkbox"><span>문제와 보기 4개가 모두 보이고, 글자가 잘리지 않는다.</span></label></li>
+          <li><label><input type="checkbox"><span>정답을 누르면 정답 표시가, 오답을 누르면 정답과 해설이 나온다.</span></label></li>
+          <li><label><input type="checkbox"><span>한 문제에서 답을 여러 번 눌러도 점수는 한 번만 오른다.</span></label></li>
+          <li><label><input type="checkbox"><span>마지막 문제 뒤에 맞힌 개수가 정확히 나온다.</span></label></li>
+          <li><label><input type="checkbox"><span>"다시 풀기"를 누르면 점수가 0부터 새로 시작한다.</span></label></li>
+          <li><label><input type="checkbox"><span>교실 뒤쪽 거리에서도 글씨가 읽힌다.</span></label></li>
+          <li><label><input type="checkbox"><span>브라우저 창을 좁게 줄여도 버튼이 화면 밖으로 나가지 않는다.</span></label></li>
+          <li><label><input type="checkbox"><span>모든 문제의 정답과 해설이 교과 내용과 맞다. 가장 중요합니다.</span></label></li>
+        </ul>
+        <p class="check-progress" id="quiz-progress" aria-live="polite"></p>
+        <div class="note note-pen">
+          <p><strong class="label">정답 확인</strong>AI가 만든 문항은 정답이나 해설이 틀릴 수 있습니다. 학생에게 쓰기 전에 questions.js의 문제를 교사가 한 번씩 직접 풀어 보세요.</p>
+        </div>
+
+        <h3 id="s6">6. 고치고 기능 더하기</h3>
+        <p>문제를 발견하면 3교시의 공식대로 말합니다. 한 번에 하나씩 요청하고, 고칠 때마다 다시 확인하세요.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>고쳐 달라는 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre><mark>[3번 문제에서 정답을 두 번 눌렀더니]</mark> <mark>[점수가 2점 올라갔어요]</mark>.
+원래는 <mark>[처음 누른 답만 인정되어야]</mark> 해요. 다른 기능은 건드리지 말고 이 부분만 고쳐 주세요.</pre>
+        </figure>
+        <p>화면이 이상하게 보이면 캡처해서 보여 주는 편이 빠릅니다. macOS는 <kbd>⌃</kbd>+<kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>4</kbd>, Windows는 <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>로 캡처하면 클립보드에 복사됩니다. 그다음 Claude Code 입력창에서 macOS 기본 터미널은 <kbd>Ctrl</kbd>+<kbd>V</kbd>, Windows는 <kbd>Alt</kbd>+<kbd>V</kbd>로 붙여넣습니다.</p>
+        <h4 class="sub-h">더해 볼 만한 기능</h4>
+        <dl class="ideas">
+          <div><dt>모둠 점수판</dt><dd>모둠 이름을 정하고, 문제마다 맞힌 모둠에 점수 주기</dd></div>
+          <div><dt>제한 시간</dt><dd>문제마다 20초 타이머, 시간이 끝나면 정답 공개</dd></div>
+          <div><dt>문제 섞기</dt><dd>풀 때마다 문제와 보기 순서를 무작위로</dd></div>
+          <div><dt>효과음</dt><dd>정답과 오답 소리, 그리고 소리 끄기 버튼</dd></div>
+          <div><dt>다른 단원</dt><dd>questions.js의 문제만 다른 단원 5문항으로 바꾸기</dd></div>
+          <div><dt>문제 추가 안내</dt><dd>교사가 questions.js에 문제를 더하는 방법을 README.md로 정리</dd></div>
+        </dl>
+        <p>기능을 더하다 잘 되던 앱이 망가지면, 입력창이 빈 상태에서 <kbd>Esc</kbd>를 두 번 눌러 되돌리기 메뉴를 열고 잘 동작하던 시점으로 돌아가세요.</p>
+
+        <h3 id="s7">7. 보관하고 나누기</h3>
+        <p>잘 동작하는 버전이 나오면 폴더를 통째로 복사해 quiz-app-v1처럼 이름을 붙여 둡니다. Git을 쓸 줄 안다면 "지금 상태를 git 커밋으로 저장해 주세요"라고 부탁해도 됩니다.</p>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">나누는 방법</th><th scope="col">이렇게 합니다</th><th scope="col">주의할 점</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">교실 화면에 띄우기</th><td>교사 PC에서 index.html을 열고 전체 화면으로 봅니다. Windows는 <kbd>F11</kbd>, macOS는 <kbd>⌃</kbd>+<kbd>⌘</kbd>+<kbd>F</kbd></td><td>가장 간단하고 안전합니다.</td></tr>
+              <tr><th scope="row">파일로 나누기</th><td>폴더를 압축해 학급 플랫폼이나 메일로 보냅니다. 받은 사람은 압축을 풀고 index.html을 엽니다.</td><td>휴대폰에서는 압축 파일을 열기 불편할 수 있습니다.</td></tr>
+              <tr><th scope="row">인터넷 주소로 나누기</th><td>GitHub Pages 같은 무료 호스팅에 올리면 주소만으로 열 수 있습니다. 올리는 방법은 Claude Code에 단계별로 물어보세요.</td><td>누구나 볼 수 있게 됩니다. 학생 정보를 넣지 말고 학교 규정을 확인하세요.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="period" id="p6" aria-labelledby="p6-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">6</span><span class="u">교시</span></p>
+          <h2 id="p6-title"><span class="sr-only">6교시. </span>막힐 때 푸는 법과 좋은 습관</h2>
+          <p class="period-meta">강의 15분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>설치하고 사용하는 중에 자주 생기는 문제를 스스로 해결할 수 있다.</li>
+            <li>AI와 오래 함께 작업할 때의 좋은 습관을 설명할 수 있다.</li>
+          </ul>
+        </div>
+
+        <h3>자주 막히는 곳</h3>
+        <div class="faq-group">
+          <details class="faq">
+            <summary><span><code>claude</code>를 입력했더니 명령을 찾을 수 없다고 나와요</span></summary>
+            <div class="faq-body"><p>설치 직후에는 터미널이 새 명령을 모를 수 있습니다. 터미널 창을 완전히 닫고 새로 연 뒤 다시 입력하세요. 그래도 안 되면 설치 명령을 한 번 더 실행하고, 설치가 끝날 때 화면에 나오는 안내를 끝까지 읽어 보세요. <code>claude</code>가 실행된다면 <code>claude doctor</code>로 설치 상태를 점검할 수 있습니다.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>Windows에서 설치 명령이 오류를 내요</span></summary>
+            <div class="faq-body"><p><code>irm</code>을 인식할 수 없다고 나오면 PowerShell이 아니라 명령 프롬프트(CMD)를 연 것입니다. 시작 메뉴에서 PowerShell을 찾아 다시 여세요. 학교망에서 접속이 막혀 오류가 난다면 정보 담당자에게 claude.ai 관련 주소를 허용해 달라고 요청하세요.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>로그인 창이 열리지 않거나 다른 계정으로 들어갔어요</span></summary>
+            <div class="faq-body"><p>브라우저가 저절로 열리지 않으면 터미널에 표시된 주소를 복사해 브라우저에 붙여넣으세요. 계정을 바꾸려면 Claude Code 안에서 <code>/login</code>을 입력합니다.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>사용량 한도에 도달했다고 나와요</span></summary>
+            <div class="faq-body"><p>요금제마다 일정 시간 동안 쓸 수 있는 양이 정해져 있습니다. 창을 열어 두면 한도가 풀린 뒤 하던 작업을 자동으로 이어 가고, 기다리지 않으려면 <kbd>Esc</kbd>로 취소할 수 있습니다. 대화가 길수록 사용량이 빨리 늘어나므로 작업이 바뀔 때마다 <code>/clear</code>로 새로 시작하세요.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>하나를 고쳐 달라고 했더니 다른 기능이 망가졌어요</span></summary>
+            <div class="faq-body"><p>입력창이 빈 상태에서 <kbd>Esc</kbd>를 두 번 눌러 되돌리기 메뉴를 열고, 망가지기 전 시점을 고르세요. 그다음 "다른 기능은 건드리지 말고 이것만 고쳐 주세요"처럼 범위를 좁혀 다시 요청합니다.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>같은 실수를 계속 되풀이해요</span></summary>
+            <div class="faq-body"><p>대화가 길어지면 앞에서 한 지시가 흐려질 수 있습니다. 지금까지 된 것과 안 된 것, 원하는 결과를 세 줄로 정리한 뒤 <code>/clear</code>로 새 대화를 열어 다시 설명하세요. 계속 지켜야 할 규칙이라면 CLAUDE.md에 적어 둡니다.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>브라우저에 하얀 화면만 나와요</span></summary>
+            <div class="faq-body"><p>코드 오류로 화면이 그려지지 않은 경우가 많습니다. 브라우저 개발자 도구를 열고(Windows는 <kbd>F12</kbd>, macOS는 <kbd>⌥</kbd>+<kbd>⌘</kbd>+<kbd>I</kbd>) Console 탭에 나온 빨간 오류 문장을 복사해, "index.html을 열면 하얀 화면만 나오고 콘솔에 이런 오류가 있어요"라고 보여 주세요.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>한글이 깨져 보여요</span></summary>
+            <div class="faq-body"><p>"모든 파일을 UTF-8로 저장하고, HTML에 문자 인코딩 설정을 넣어 주세요"라고 요청하세요.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>답이 영어로 나와요</span></summary>
+            <div class="faq-body"><p>"앞으로 한국어로 답해 주세요"라고 말하거나, CLAUDE.md에 "답변은 한국어로"라고 적어 둡니다.</p></div>
+          </details>
+          <details class="faq">
+            <summary><span>권한 요청이 너무 자주 나와 번거로워요</span></summary>
+            <div class="faq-body"><p>연습 폴더에서 파일 수정만 되풀이된다면 <kbd>Shift</kbd>+<kbd>Tab</kbd>으로 파일 수정 자동 허락 모드를 쓸 수 있습니다. 명령 실행이나 다른 폴더에 접근하려는 요청은 계속 읽고 판단하세요. 모든 확인을 건너뛰는 옵션은 쓰지 않습니다.</p></div>
+          </details>
+        </div>
+
+        <h3>오래 함께 일하는 다섯 가지 습관</h3>
+        <ul class="lead-list">
+          <li><strong>작게 시작하기.</strong> 기능 세 개짜리를 먼저 완성하고 하나씩 더합니다.</li>
+          <li><strong>한 번에 하나씩.</strong> 여러 가지를 한꺼번에 부탁하면 무엇이 문제를 일으켰는지 찾기 어렵습니다.</li>
+          <li><strong>계획 먼저.</strong> 큰 기능은 계획 모드로 방향부터 맞춥니다.</li>
+          <li><strong>잘 되면 저장.</strong> 동작하는 버전은 폴더를 복사해 두거나 git으로 저장합니다.</li>
+          <li><strong>결과는 사람이 확인.</strong> 코드는 읽지 못해도 동작, 내용, 정답은 반드시 직접 봅니다.</li>
+        </ul>
+        <div class="note">
+          <p><strong class="label">대화 정리</strong><code>/clear</code>는 대화를 비우고 새로 시작합니다. 이전 대화는 지워지지 않아 나중에 다시 불러올 수 있습니다. <code>/compact</code>는 지금까지의 대화를 요약해 짧게 줄인 뒤 이어 갑니다. 작업 주제가 바뀌면 <code>/clear</code>, 같은 작업인데 대화가 길어졌다면 <code>/compact</code>를 쓰세요.</p>
+        </div>
+      </section>
+
+      <section class="period" id="p7" aria-labelledby="p7-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">7</span><span class="u">교시</span></p>
+          <h2 id="p7-title"><span class="sr-only">7교시. </span>안전 수칙과 교실 적용 계획</h2>
+          <p class="period-meta">토의와 실습 15분</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>생성형 AI를 수업과 업무에 쓸 때 지킬 안전 수칙을 설명할 수 있다.</li>
+            <li>우리 반에 적용할 첫 수업 도구를 계획할 수 있다.</li>
+          </ul>
+        </div>
+
+        <h3>교사가 지킬 일곱 가지 수칙</h3>
+        <ol class="rules">
+          <li><strong>학생 개인정보는 넣지 않습니다.</strong> 이름, 성적, 상담과 건강 정보, 연락처, 얼굴 사진은 대화에도 파일에도 넣지 않습니다. 꼭 필요하면 번호나 가명으로 바꿉니다.</li>
+          <li><strong>학생이 Claude를 직접 쓰게 하지 않습니다.</strong> Claude 계정은 만 18세 이상만 만들고 쓸 수 있습니다. 교사 계정을 학생에게 빌려주는 일도 피하고, 학생에게는 교사가 만든 결과물을 쓰게 합니다. 오늘 만든 퀴즈 앱은 Claude에 접속하지 않으므로 학생이 써도 됩니다.</li>
+          <li><strong>결과물은 교사가 검증합니다.</strong> 사실, 정답, 맞춤법, 편향된 표현을 확인한 뒤 학생에게 제공합니다.</li>
+          <li><strong>Claude Code는 연습 폴더에서만 실행합니다.</strong> 권한 요청은 읽고 나서 허락하고, 모든 확인을 건너뛰는 옵션은 쓰지 않습니다. 모르는 명령을 실행하려 하면 "이 명령이 무엇을 하는지 먼저 설명해 주세요"라고 묻습니다.</li>
+          <li><strong>저작권을 지킵니다.</strong> 교과서 본문, 문제집 문항, 인터넷에서 찾은 그림과 음원을 그대로 넣어 배포하지 않습니다. 직접 만든 문항과 이용이 허락된 자료를 씁니다.</li>
+          <li><strong>개인정보 설정을 확인합니다.</strong> 개인 플랜은 설정의 개인정보 항목에서 대화 내용을 AI 모델 개선에 활용할지 고를 수 있습니다. 업무 자료를 다룬다면 이 설정과 기관용 플랜 여부를 함께 살펴보세요.</li>
+          <li><strong>학교와 교육청 지침이 먼저입니다.</strong> 생성형 AI 활용 지침, 정보 보안 규정, 개인정보 보호 규정을 먼저 확인합니다.</li>
+        </ol>
+
+        <h3>함께 이야기해 봅시다</h3>
+        <ul class="quotes">
+          <li>우리 학교에서 AI 도구를 쓸 때 교사끼리 미리 합의해 둘 규칙은 무엇일까요?</li>
+          <li>AI의 도움으로 만든 도구를 학생에게 쓰게 할 때, 학생과 학부모에게 무엇을 알리면 좋을까요?</li>
+          <li>오늘 만든 도구 가운데 동료 교사와 나누고 싶은 것은 무엇이고, 어떻게 나눌까요?</li>
+        </ul>
+
+        <h3>실습: 나의 첫 수업 도구 계획서</h3>
+        <p>칸을 채우면 연수가 끝난 뒤 Claude Code에 보낼 첫 요청문이 만들어집니다. 입력한 내용은 이 브라우저에만 저장되고 어디로도 전송되지 않습니다. 공용 컴퓨터라면 다 쓴 뒤 내용 지우기를 누르세요.</p>
+        <div class="builder" id="plan">
+          <div class="builder-fields">
+            <label class="field"><span>반복되거나 불편한 수업 장면</span><textarea id="p-scene" rows="2" placeholder="예: 모둠을 짤 때마다 10분씩 걸리고 불만이 나온다"></textarea></label>
+            <label class="field"><span>만들 도구 한 줄 설명</span><input id="p-tool" type="text" autocomplete="off" placeholder="예: 직전 모둠과 겹치지 않게 모둠을 짜 주는 도구"></label>
+            <label class="field"><span>쓰는 사람과 장소</span><input id="p-who" type="text" autocomplete="off" placeholder="예: 교사가 교실 TV에 띄워서"></label>
+            <label class="field"><span>꼭 필요한 기능 (한 줄에 하나)</span><textarea id="p-must" rows="3" placeholder="예: 번호 붙여넣기&#10;직전 모둠과 겹치지 않게 뽑기&#10;큰 글씨 결과 화면"></textarea></label>
+            <label class="field"><span>이번에는 안 할 것</span><input id="p-not" type="text" autocomplete="off" placeholder="예: 로그인, 인터넷 연결"></label>
+            <label class="field"><span>처음 써 볼 날</span><input id="p-when" type="text" autocomplete="off" placeholder="예: 다음 주 월요일 3교시"></label>
+            <button class="btn-plain" type="button" id="plan-clear">내용 지우기</button>
+          </div>
+          <div class="builder-out">
+            <figure class="prompt">
+              <figcaption class="fig-bar"><span>연수 뒤 첫 요청문</span><button class="copy" type="button">복사</button></figcaption>
+              <pre id="p-output">수업에 쓸 도구를 만들고 싶어요. 아직 파일은 만들지 말고 계획만 세워 주세요.
+
+만들 도구: [만들 도구 한 줄 설명]
+해결하고 싶은 문제: [반복되거나 불편한 수업 장면]
+쓰는 사람과 장소: [쓰는 사람과 장소]
+꼭 필요한 기능:
+- [기능]
+이번에는 안 할 것: [이번에는 안 할 것]
+조건: 한국어 화면, 설치 없이 파일을 열면 동작, 학생 개인정보는 저장하거나 밖으로 보내지 않기
+
+어떤 파일을 만들지, 화면이 어떤 순서로 바뀌는지, 제가 확인할 점이 무엇인지 알려 주세요.</pre>
+            </figure>
+            <p class="small" id="p-when-out">처음 써 볼 날도 정해 두세요.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="period" id="p8" aria-labelledby="p8-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n">8</span><span class="u">교시</span></p>
+          <h2 id="p8-title"><span class="sr-only">8교시. </span>오프라인 수행평가와 학생 활동 기록</h2>
+          <p class="period-meta">심화 실습 50분. 후속 연수로 따로 운영해도 좋습니다.</p>
+        </header>
+        <div class="goals">
+          <p class="goals-title">학습 목표</p>
+          <ul>
+            <li>인터넷 없이 교실에서 쓰는 수행평가 기록 도구를 만들고 결과를 파일로 내보낼 수 있다.</li>
+            <li>Apps Script로 스프레드시트에 쌓인 학생 활동 기록을 자동으로 정리해 확인할 수 있다.</li>
+            <li>학생 기록을 다룰 때 지킬 규칙을 도구에 직접 반영할 수 있다.</li>
+          </ul>
+        </div>
+        <p>앞의 25분은 인터넷 없이 쓰는 평가 기록 도구를, 뒤의 25분은 구글 스프레드시트 자동화를 다룹니다. 7교시의 안전 수칙을 지킨다는 전제에서 진행하며, <mark>이름 대신 번호</mark>를 쓰는 원칙을 처음부터 끝까지 지킵니다.</p>
+
+        <h3>세 가지 방법, 어디에 쓸까요</h3>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">만드는 방법</th><th scope="col">어울리는 일</th><th scope="col">기록이 남는 곳</th><th scope="col">인터넷</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">채팅 결과물</th><td>아이디어를 빠르게 시험해 보기</td><td>대화 안. 오래 보관하기에는 부적합</td><td>필요</td></tr>
+              <tr><th scope="row">내 기기의 웹 도구</th><td>교실에서 반복해 쓰는 도구, 수행평가 기록</td><td>내 컴퓨터나 태블릿 안</td><td>필요 없음</td></tr>
+              <tr><th scope="row">Apps Script</th><td>설문 응답과 과제 제출 현황 정리</td><td>학교 구글 드라이브</td><td>필요</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="a1">파트 1. 오프라인 수행평가 기록 도구</h3>
+        <p>체육관, 과학실, 운동장처럼 무선망이 약한 곳에서도 수행평가는 진행됩니다. 파일 하나를 열어 쓰고 기록이 기기 밖으로 나가지 않는 도구라면 망 상태와 개인정보 걱정을 함께 줄일 수 있습니다. 5교시의 퀴즈 앱과 같은 방식으로, 이번에는 교사가 손에 들고 쓰는 기록판을 만듭니다.</p>
+        <p>평가 요소는 2교시 요청문 도우미로 만든 채점 기준표를 그대로 옮겨 오세요. 기준과 도구가 따로 놀지 않게 됩니다.</p>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>수행평가 기록 도구 계획 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>교실에서 수행평가를 기록할 웹 도구를 만들고 싶어요. 아직 파일은 만들지 말고 계획만 세워 주세요.
+
+- 인터넷 없이 index.html을 열면 동작하고, 밖으로는 아무것도 보내지 않기
+- 평가 대상은 번호만 사용(1번부터 <mark>[28]</mark>번). 이름은 넣지 않음
+- 평가 요소는 <mark>[자료 조사, 발표 태도, 협력]</mark> 세 가지, 요소마다 3단계
+- 번호를 고르면 요소별 단계를 큰 버튼으로 누르고, 한 줄 메모를 적을 수 있게
+- 아직 평가하지 않은 번호가 한눈에 보이게
+- 태블릿을 세로로 들고도 버튼이 크게 보이게
+- 기록은 이 기기의 브라우저에만 저장하고, "CSV로 내보내기" 버튼으로 파일 저장
+- "전체 지우기"는 한 번 더 확인한 뒤에 지우기
+
+어떤 파일을 만들지, 화면이 어떤 순서로 바뀌는지, 제가 확인할 점이 무엇인지 알려 주세요.</pre>
+        </figure>
+        <p>계획을 확인하고 만들게 한 다음, 반드시 혼자 먼저 써 봅니다. 수업 중에 처음 써 보면 고칠 시간이 없습니다.</p>
+        <ul class="checklist" data-key="assess-check" data-progress="assess-progress">
+          <li><label><input type="checkbox"><span>인터넷을 끄고 열어도 모든 기능이 동작한다.</span></label></li>
+          <li><label><input type="checkbox"><span>번호를 잘못 눌렀을 때 다시 고쳐 입력할 수 있다.</span></label></li>
+          <li><label><input type="checkbox"><span>브라우저를 닫았다 열어도 기록이 그대로 남아 있다.</span></label></li>
+          <li><label><input type="checkbox"><span>내보낸 CSV를 스프레드시트에서 열면 번호, 요소, 단계, 메모가 제대로 들어 있다.</span></label></li>
+          <li><label><input type="checkbox"><span>한글 메모가 깨지지 않는다.</span></label></li>
+          <li><label><input type="checkbox"><span>전체 지우기를 눌러도 확인 절차 없이 지워지지는 않는다.</span></label></li>
+          <li><label><input type="checkbox"><span>화면 어디에도 학생 이름이 나타나지 않는다.</span></label></li>
+          <li><label><input type="checkbox"><span>태블릿 세로 화면에서 버튼을 손가락으로 정확히 누를 수 있다.</span></label></li>
+        </ul>
+        <p class="check-progress" id="assess-progress" aria-live="polite"></p>
+        <div class="note note-pen">
+          <p><strong class="label">기기 관리</strong>학생과 함께 쓰는 태블릿이라면 평가가 끝난 뒤 CSV로 내보내고 브라우저에 남은 기록을 지우세요. 번호와 이름을 잇는 표는 교사 컴퓨터에만 두고, 도구에는 번호만 넣습니다.</p>
+        </div>
+        <div class="note">
+          <p><strong class="label">한글이 깨질 때</strong>내보낸 CSV를 엑셀에서 열었더니 한글이 깨진다면 "CSV 파일을 UTF-8 BOM으로 저장해 주세요"라고 요청하세요. 한 줄만 고치면 해결됩니다.</p>
+        </div>
+
+        <h3 id="a2">파트 2. Apps Script로 학생 활동 기록 확인하기</h3>
+        <p>Apps Script는 구글 스프레드시트, 설문지, 문서에 붙여 쓰는 자동화 도구입니다. 구글 계정만 있으면 되고 따로 설치할 것이 없어서, 4교시의 설치 과정을 건너뛰고도 자동화를 맛볼 수 있습니다. 코드는 Claude에게 부탁해 받아서 붙여넣습니다.</p>
+        <p>가장 흔한 흐름은 이렇습니다. 학생이 구글 설문지로 과제나 자기평가를 제출하면 응답이 스프레드시트에 쌓이고, Apps Script가 그 시트를 읽어 제출 현황과 미제출 번호를 정리해 줍니다. 명단과 응답을 눈으로 대조하던 일이 버튼 하나로 바뀝니다.</p>
+        <ol class="steps">
+          <li>
+            <h4>응답을 모을 시트를 준비합니다</h4>
+            <p>구글 설문지의 응답 탭에서 스프레드시트에 연결합니다. 설문 문항은 이름 대신 번호나 학번을 받도록 만들고, 명단 시트에는 우리 반 번호를 미리 적어 둡니다.</p>
+          </li>
+          <li>
+            <h4>Apps Script 편집기를 엽니다</h4>
+            <p>스프레드시트 상단 메뉴에서 확장 프로그램 &gt; Apps Script를 고르면 새 탭에 코드 편집기가 열립니다. 이렇게 만든 스크립트는 그 스프레드시트에만 붙어 있습니다.</p>
+          </li>
+          <li>
+            <h4>실제 자료 대신 구조만 알려 주고 코드를 받습니다</h4>
+            <p>Claude에는 시트 이름과 열 제목, 가짜 예시 한 줄만 보냅니다. 실제 응답을 통째로 붙여넣지 않습니다.</p>
+            <figure class="prompt">
+              <figcaption class="fig-bar"><span>Apps Script 요청</span><button class="copy" type="button">복사</button></figcaption>
+              <pre>구글 스프레드시트에서 쓸 Apps Script 코드를 만들어 주세요. 코드를 모르는 교사가 붙여넣어 쓸 수 있게 주석은 한국어로 달아 주세요.
+
+시트 구성
+- "설문지 응답" 시트: A열 타임스탬프, B열 학번, C열 과제 링크, D열 자기평가 점수
+- 예시 한 줄(가짜 자료): 2026-03-02 09:15 / <mark>[10101]</mark> / https://example.com / 4
+- "명단" 시트: A열에 우리 반 학번
+
+원하는 동작
+- "제출 현황" 시트를 만들어 학번별 제출 여부(O, X), 마지막 제출 시각, 자기평가 점수를 정리
+- 한 학생이 여러 번 제출했으면 가장 마지막 것만 반영
+- 미제출 학번은 맨 위에 모아서 보여 주기
+- 스프레드시트 상단에 "수업 도우미" 메뉴를 만들어 거기서 실행
+
+지켜 주세요
+- 코드 맨 위에 @OnlyCurrentDoc 주석을 넣어 이 스프레드시트에만 접근하게 하기
+- 학생 이름은 다루지 않기
+- 메일이나 외부 주소로 자료를 보내는 코드는 넣지 않기
+- 원본 응답 시트는 고치지 말고 읽기만 하기</pre>
+            </figure>
+          </li>
+          <li>
+            <h4>코드를 붙여넣고 실행합니다</h4>
+            <p>편집기에 있던 기본 코드를 지우고 받은 코드를 붙여넣은 뒤 저장합니다. 처음 실행하면 내 계정으로 이 스프레드시트에 접근해도 되는지 묻는 승인 창이 나옵니다. 내가 직접 만든 스크립트일 때만 승인하고, 남이 보낸 스크립트는 승인하지 마세요.</p>
+            <figure class="board">
+              <figcaption class="fig-bar"><span>받은 코드의 앞부분은 대개 이런 모양입니다</span></figcaption>
+              <pre class="soft"><code>function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('수업 도우미')
+    .addItem('제출 현황 만들기', 'makeSubmissionSheet')
+    .addToUi();
+}</code></pre>
+            </figure>
+            <p class="small">스프레드시트 상단에 "수업 도우미" 메뉴를 만들어 주는 부분입니다. 외울 필요는 없고, 무슨 일을 하는 코드인지 궁금하면 Claude에게 물어보면 됩니다.</p>
+          </li>
+          <li>
+            <h4>결과를 확인하고 고칩니다</h4>
+            <p>제출 현황 시트를 명단과 대조해 봅니다. 틀린 곳이 있으면 3교시의 공식대로 말합니다. 빨간 오류 창이 뜨면 그 문장을 그대로 복사해 보여 주세요. 편집기의 실행 로그에서도 오류를 확인할 수 있습니다.</p>
+          </li>
+          <li>
+            <h4>자동으로 실행되게 합니다 (선택)</h4>
+            <p>편집기 왼쪽의 트리거에서 설문이 제출될 때마다, 또는 매일 정해진 시각에 실행되도록 예약할 수 있습니다. "매일 오전 8시에 제출 현황을 새로 만드는 트리거를 어떻게 거는지 단계별로 알려 주세요"라고 물으면 화면 순서를 안내해 줍니다.</p>
+          </li>
+        </ol>
+        <div class="note note-pen">
+          <p><strong class="label">학교 계정 확인</strong>교육청에서 준 구글 계정은 Apps Script 실행이나 외부 공유가 막혀 있을 수 있습니다. 연수 전에 정보 담당자에게 확인하고, 스프레드시트 공유 범위가 링크 공개로 되어 있지 않은지도 함께 보세요.</p>
+        </div>
+        <div class="note">
+          <p><strong class="label">사본에서 먼저</strong>시트를 지우거나 덮어쓰는 동작이 들어간 스크립트는 사본을 만들어 시험하세요. 파일 &gt; 사본 만들기로 복사한 뒤 마음 놓고 돌려 보면 됩니다.</p>
+        </div>
+
+        <h4 class="sub-h">이어서 해 볼 만한 것</h4>
+        <dl class="ideas">
+          <div><dt>수업 끝 3분 설문</dt><dd>오늘 이해한 정도와 질문을 받아 요약 시트로 자동 정리</dd></div>
+          <div><dt>미제출 알림 목록</dt><dd>미제출 번호만 뽑아 교실 화면에 띄울 목록 만들기. 이름은 넣지 않기</dd></div>
+          <div><dt>모둠별 진행 상황</dt><dd>모둠 번호로 묶어 어느 모둠이 어디까지 했는지 한눈에</dd></div>
+          <div><dt>링크 점검</dt><dd>과제 링크가 비어 있거나 형식이 이상한 줄을 표시</dd></div>
+          <div><dt>독서 기록 집계</dt><dd>학기 누적 권수와 갈래별 분포를 자동으로 계산</dd></div>
+          <div><dt>수행평가 CSV 합치기</dt><dd>파트 1에서 내보낸 CSV를 시트에 붙여 반별로 정리</dd></div>
+        </dl>
+        <p>도구가 늘어날수록 <mark>어떤 자료가 어디에 저장되는지</mark> 교사가 설명할 수 있어야 합니다. 새 도구를 만들 때마다 "이 도구는 어떤 자료를 어디에 저장하나요? 밖으로 나가는 것이 있나요?"라고 물어 확인하는 습관을 들이세요.</p>
+      </section>
+
+      <section class="period" id="appendix" aria-labelledby="ap-title">
+        <header class="period-head">
+          <p class="period-no" aria-hidden="true"><span class="n n-word">부록</span></p>
+          <h2 id="ap-title"><span class="sr-only">부록. </span>명령어, 템플릿, 참고 링크</h2>
+          <p class="period-meta">연수 중에도, 연수 뒤에도 찾아보는 자료</p>
+        </header>
+
+        <h3>Claude Code 명령어</h3>
+        <h4 class="sub-h">터미널에서 입력</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">입력</th><th scope="col">하는 일</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>claude</code></th><td>지금 폴더에서 Claude Code 시작</td></tr>
+              <tr><th scope="row"><code>claude --continue</code></th><td>이 폴더의 직전 대화 이어 가기. 줄여서 <code>-c</code></td></tr>
+              <tr><th scope="row"><code>claude --resume</code></th><td>지난 대화 목록에서 골라 이어 가기. 줄여서 <code>-r</code></td></tr>
+              <tr><th scope="row"><code>claude --version</code></th><td>설치된 버전 확인</td></tr>
+              <tr><th scope="row"><code>claude update</code></th><td>지금 바로 최신 버전으로 업데이트</td></tr>
+              <tr><th scope="row"><code>claude doctor</code></th><td>설치 상태와 설정 점검</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4 class="sub-h">Claude Code 안에서 입력</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">입력</th><th scope="col">하는 일</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>/help</code></th><td>도움말과 명령어 목록</td></tr>
+              <tr><th scope="row"><code>/init</code></th><td>폴더를 분석해 CLAUDE.md 초안 만들기</td></tr>
+              <tr><th scope="row"><code>/memory</code></th><td>CLAUDE.md 같은 메모 파일을 열어 고치기</td></tr>
+              <tr><th scope="row"><code>/clear</code></th><td>대화를 비우고 새로 시작. 이전 대화는 보관됩니다.</td></tr>
+              <tr><th scope="row"><code>/compact</code></th><td>지금까지의 대화를 요약해 줄인 뒤 이어 가기</td></tr>
+              <tr><th scope="row"><code>/rewind</code></th><td>이전 시점의 대화와 코드로 되돌리기. 빈 입력창에서 <kbd>Esc</kbd> 두 번과 같습니다.</td></tr>
+              <tr><th scope="row"><code>/model</code></th><td>사용할 모델 바꾸기</td></tr>
+              <tr><th scope="row"><code>/login</code></th><td>로그인하거나 계정 바꾸기</td></tr>
+              <tr><th scope="row"><code>/exit</code></th><td>끝내기</td></tr>
+              <tr><th scope="row"><code>@파일이름</code></th><td>특정 파일을 콕 집어 알려 주기</td></tr>
+              <tr><th scope="row"><kbd>?</kbd></th><td>빈 입력창에서 누르면 단축키 도움말</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>터미널 기초</h3>
+        <div class="table-wrap">
+          <table class="wide">
+            <thead><tr><th scope="col">하려는 일</th><th scope="col">macOS 터미널</th><th scope="col">Windows PowerShell</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">지금 있는 폴더 보기</th><td><code>pwd</code></td><td><code>pwd</code></td></tr>
+              <tr><th scope="row">폴더 안의 파일 보기</th><td><code>ls</code></td><td><code>ls</code></td></tr>
+              <tr><th scope="row">폴더로 들어가기</th><td><code>cd 폴더이름</code></td><td><code>cd 폴더이름</code></td></tr>
+              <tr><th scope="row">한 단계 위로 나가기</th><td><code>cd ..</code></td><td><code>cd ..</code></td></tr>
+              <tr><th scope="row">사용자 폴더로 가기</th><td><code>cd ~</code></td><td><code>cd ~</code></td></tr>
+              <tr><th scope="row">새 폴더 만들기</th><td><code>mkdir 이름</code></td><td><code>mkdir 이름</code></td></tr>
+              <tr><th scope="row">지금 폴더를 창으로 열기</th><td><code>open .</code></td><td><code>explorer .</code></td></tr>
+              <tr><th scope="row">파일을 기본 프로그램으로 열기</th><td><code>open index.html</code></td><td><code>start index.html</code></td></tr>
+              <tr><th scope="row">실행 중인 것 멈추기</th><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">폴더 이름을 몇 글자 치고 <kbd>Tab</kbd>을 누르면 나머지가 자동으로 채워집니다. <kbd>↑</kbd>를 누르면 방금 입력한 명령을 다시 불러옵니다.</p>
+
+        <h3>복사해 쓰는 요청 틀</h3>
+        <figure class="prompt">
+          <figcaption class="fig-bar"><span>새 도구 요청</span><button class="copy" type="button">복사</button></figcaption>
+          <pre>아래 수업 도구를 만들어 주세요. 만들기 전에 계획을 먼저 보여 주세요.
+
+만들 도구: <mark>[도구 이름과 한 줄 설명]</mark>
+쓰는 사람과 장소: <mark>[교사가 교실 TV에서]</mark>
+꼭 필요한 기능:
+- <mark>[기능 1]</mark>
+- <mark>[기능 2]</mark>
+- <mark>[기능 3]</mark>
+이번에는 안 할 것: <mark>[로그인, 인터넷 연결]</mark>
+조건: 한국어 화면, 설치 없이 파일을 열면 동작, 교실 뒤에서도 읽히는 큰 글씨</pre>
+        </figure>
+        <div class="two-col">
+          <figure class="prompt">
+            <figcaption class="fig-bar"><span>고쳐 달라는 요청</span><button class="copy" type="button">복사</button></figcaption>
+            <pre><mark>[무엇을 했더니]</mark> <mark>[어떻게 됐어요]</mark>.
+원래는 <mark>[어떻게 되어야]</mark> 해요.
+다른 기능은 건드리지 말고 이 부분만 고쳐 주세요.</pre>
+          </figure>
+          <figure class="prompt">
+            <figcaption class="fig-bar"><span>설명해 달라는 요청</span><button class="copy" type="button">복사</button></figcaption>
+            <pre>방금 바꾼 내용을 코드를 모르는 교사가 이해할 수 있게 세 줄로 설명해 주세요. 제가 직접 확인해야 할 점도 알려 주세요.</pre>
+          </figure>
+          <figure class="prompt">
+            <figcaption class="fig-bar"><span>명령을 실행하기 전에</span><button class="copy" type="button">복사</button></figcaption>
+            <pre>방금 실행하려는 명령이 무엇을 하는지, 제 컴퓨터에 어떤 영향이 있는지 먼저 쉬운 말로 설명해 주세요.</pre>
+          </figure>
+          <figure class="prompt">
+            <figcaption class="fig-bar"><span>새 대화로 넘어가기 전에</span><button class="copy" type="button">복사</button></figcaption>
+            <pre>지금까지 한 작업을 다음 대화에서 이어 갈 수 있게 정리해 주세요. 완성된 기능, 아직 안 되는 것, 다음에 할 일을 나누어 적어 주세요.</pre>
+          </figure>
+        </div>
+
+        <h3>용어 풀이</h3>
+        <dl class="ideas">
+          <div><dt>프롬프트</dt><dd>AI에게 보내는 요청 문장</dd></div>
+          <div><dt>환각</dt><dd>사실이 아닌 내용을 그럴듯하게 지어내는 현상</dd></div>
+          <div><dt>컨텍스트</dt><dd>Claude가 한 대화에서 참고하는 내용 전체. 길어지면 앞부분이 흐려질 수 있습니다.</dd></div>
+          <div><dt>아티팩트</dt><dd>채팅 옆 창에 만들어지는 문서, 웹 도구 같은 결과물</dd></div>
+          <div><dt>바이브 코딩</dt><dd>말로 설명하고 결과를 확인하며 고쳐 나가는 코딩 방식</dd></div>
+          <div><dt>터미널</dt><dd>글자로 컴퓨터에 명령하는 창. macOS의 터미널, Windows의 PowerShell</dd></div>
+          <div><dt>CLAUDE.md</dt><dd>Claude Code가 폴더에서 작업을 시작할 때 먼저 읽는 규칙 메모</dd></div>
+          <div><dt>권한 요청</dt><dd>파일 수정이나 명령 실행 전에 허락을 묻는 확인 창</dd></div>
+          <div><dt>계획 모드</dt><dd>파일을 바꾸지 않고 계획만 세우는 작업 방식</dd></div>
+          <div><dt>체크포인트</dt><dd>되돌아갈 수 있도록 자동으로 기록되는 작업 시점</dd></div>
+          <div><dt>Apps Script</dt><dd>구글 스프레드시트, 설문지, 문서에 붙여 쓰는 자동화 코드. 설치 없이 구글 계정으로 사용합니다.</dd></div>
+          <div><dt>트리거</dt><dd>설문 제출, 매일 아침처럼 정해진 때에 스크립트가 저절로 실행되게 하는 예약</dd></div>
+          <div><dt>CSV</dt><dd>쉼표로 칸을 나눈 표 파일. 엑셀이나 스프레드시트에서 열 수 있습니다.</dd></div>
+        </dl>
+
+        <h3>공식 링크</h3>
+        <p>제품 정보는 자주 바뀝니다. 연수 전에 아래 공식 페이지에서 요금제, 설치 방법, 이용 조건을 확인하세요. 대부분 영어 문서이므로 브라우저 번역 기능을 쓰거나 Claude에게 요약을 부탁하면 편합니다.</p>
+        <ul class="links">
+          <li><a href="https://code.claude.com/docs/en/setup" target="_blank" rel="noopener noreferrer">Claude Code 설치와 시스템 요구 사항</a><span class="src">code.claude.com</span></li>
+          <li><a href="https://code.claude.com/docs/en/quickstart" target="_blank" rel="noopener noreferrer">Claude Code 빠른 시작</a><span class="src">code.claude.com</span></li>
+          <li><a href="https://code.claude.com/docs/en/terminal-guide" target="_blank" rel="noopener noreferrer">터미널이 처음인 분을 위한 안내</a><span class="src">code.claude.com</span></li>
+          <li><a href="https://code.claude.com/docs/en/desktop-quickstart" target="_blank" rel="noopener noreferrer">데스크톱 앱에서 Claude Code 쓰기</a><span class="src">code.claude.com</span></li>
+          <li><a href="https://code.claude.com/docs/en/troubleshoot-install" target="_blank" rel="noopener noreferrer">설치와 로그인 문제 해결</a><span class="src">code.claude.com</span></li>
+          <li><a href="https://code.claude.com/docs/en/interactive-mode" target="_blank" rel="noopener noreferrer">단축키와 입력 방법 전체 목록</a><span class="src">code.claude.com</span></li>
+          <li><a href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener noreferrer">프롬프트 작성 안내</a><span class="src">docs.claude.com</span></li>
+          <li><a href="https://support.claude.com" target="_blank" rel="noopener noreferrer">Claude 고객 지원 센터: 요금제, 계정, 기능</a><span class="src">support.claude.com</span></li>
+          <li><a href="https://support.claude.com/en/articles/13117299-minimum-age-requirement-access-restriction" target="_blank" rel="noopener noreferrer">이용 연령 안내</a><span class="src">support.claude.com</span></li>
+          <li><a href="https://www.anthropic.com/news" target="_blank" rel="noopener noreferrer">Anthropic 소식</a><span class="src">anthropic.com</span></li>
+          <li><a href="https://developers.google.com/apps-script/quickstart/fundamentals-codelabs?hl=ko" target="_blank" rel="noopener noreferrer">Apps Script 기본 익히기 (한국어 실습)</a><span class="src">developers.google.com</span></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer class="foot">
+    <p>2026년 9월, Claude와 함께 만든 교원 연수 자료입니다. 학교 상황에 맞게 자유롭게 고쳐 쓰세요. 제품 정보는 바뀔 수 있으니 부록의 공식 링크로 확인해 주세요.</p>
+  </footer>
+</div>
+
+<p id="live" class="sr-only" aria-live="polite"></p>
+
+<script>
+(function () {
+  'use strict';
+  var each = function (list, fn) { Array.prototype.forEach.call(list, fn); };
+  var live = document.getElementById('live');
+  function announce(msg) {
+    if (!live) return;
+    live.textContent = '';
+    window.setTimeout(function () { live.textContent = msg; }, 50);
+  }
+  function load(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } }
+  function store(key, value) { try { window.localStorage.setItem(key, value); } catch (e) {} }
+  function forget(key) { try { window.localStorage.removeItem(key); } catch (e) {} }
+
+  /* 별표: 화면에 들어오면 빨간 펜으로 그린다 */
+  var stars = document.querySelectorAll('.star-mark');
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (calm || !('IntersectionObserver' in window)) {
+    each(stars, function (s) { s.classList.add('drawn'); });
+  } else {
+    var starWatch = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('drawn');
+        starWatch.unobserve(en.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    each(stars, function (s) { starWatch.observe(s); });
+  }
+
+  /* 복사 버튼 */
+  function selectNode(node) {
+    try {
+      var range = document.createRange();
+      range.selectNodeContents(node);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (e) {}
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  each(document.querySelectorAll('.copy'), function (btn) {
+    var fig = btn.closest('figure');
+    var cap = fig && fig.querySelector('.fig-bar span');
+    if (cap) btn.setAttribute('aria-label', cap.textContent.trim() + ' 복사');
+    btn.addEventListener('click', function () {
+      var pre = fig && fig.querySelector('pre');
+      if (!pre) return;
+      var text = pre.textContent.replace(/\s+$/, '');
+      var finish = function (ok) {
+        btn.textContent = ok ? '복사됨' : '직접 복사';
+        announce(ok ? '클립보드에 복사했습니다.' : '자동 복사가 막혀 글자를 선택해 두었습니다. 복사 단축키를 눌러 주세요.');
+        if (!ok) selectNode(pre);
+        window.clearTimeout(btn._timer);
+        btn._timer = window.setTimeout(function () { btn.textContent = '복사'; }, 1800);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function () { finish(true); }, function () { finish(legacyCopy(text)); });
+      } else {
+        finish(legacyCopy(text));
+      }
+    });
+  });
+
+  /* 차례: 지금 읽는 교시 표시 */
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  var ids = [];
+  each(tocLinks, function (a) {
+    var id = a.getAttribute('href').slice(1);
+    if (ids.indexOf(id) < 0) ids.push(id);
+  });
+  var sections = ids.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  var currentId = null;
+  function setCurrent(id) {
+    if (id === currentId) return;
+    currentId = id;
+    each(tocLinks, function (a) {
+      if (id && a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  }
+  var ticking = false;
+  function spy() {
+    ticking = false;
+    var line = window.innerHeight * 0.3;
+    var id = null;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].getBoundingClientRect().top <= line) id = sections[i].id;
+    }
+    setCurrent(id);
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(spy); }
+  }, { passive: true });
+  window.addEventListener('resize', spy);
+  spy();
+  var tocMobile = document.querySelector('.toc-mobile');
+  if (tocMobile) {
+    tocMobile.addEventListener('click', function (e) {
+      if (e.target.closest('a')) tocMobile.removeAttribute('open');
+    });
+  }
+
+  /* 탭 */
+  each(document.querySelectorAll('.tabs'), function (group) {
+    var tabs = Array.prototype.slice.call(group.querySelectorAll('[role="tab"]'));
+    var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+    function select(index, focus) {
+      tabs.forEach(function (t, i) {
+        var on = i === index;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        if (panels[i]) panels[i].hidden = !on;
+      });
+      if (focus) tabs[index].focus();
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { select(i, false); });
+      t.addEventListener('keydown', function (e) {
+        var next = null;
+        if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = tabs.length - 1;
+        if (next !== null) { e.preventDefault(); select(next, true); }
+      });
+    });
+    var platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || '';
+    var start = 0;
+    if (/^win|windows/i.test(platform)) {
+      tabs.forEach(function (t, i) { if (t.getAttribute('data-os') === 'win') start = i; });
+    }
+    select(start, false);
+  });
+
+  /* 점검표 */
+  each(document.querySelectorAll('.checklist[data-key]'), function (list) {
+    var key = 'vibe-training:' + list.getAttribute('data-key');
+    var boxes = Array.prototype.slice.call(list.querySelectorAll('input[type="checkbox"]'));
+    var out = document.getElementById(list.getAttribute('data-progress'));
+    var saved = [];
+    try { saved = JSON.parse(load(key) || '[]'); } catch (e) { saved = []; }
+    if (!Array.isArray(saved)) saved = [];
+    boxes.forEach(function (b, i) { b.checked = saved.indexOf(i) > -1; });
+    function render() {
+      var n = boxes.filter(function (b) { return b.checked; }).length;
+      if (out) out.textContent = boxes.length + '개 중 ' + n + '개 확인' + (n === boxes.length ? '. 모두 확인했습니다.' : '');
+    }
+    list.addEventListener('change', function () {
+      var done = [];
+      boxes.forEach(function (b, i) { if (b.checked) done.push(i); });
+      store(key, JSON.stringify(done));
+      render();
+    });
+    render();
+  });
+
+  /* 입력 도우미 공통 */
+  function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function lines(text) {
+    return text.split(/\n+/).map(function (s) { return s.replace(/^\s*[-•*·]\s*/, '').trim(); }).filter(Boolean);
+  }
+  function oneLine(text) { return text.replace(/\s*\n+\s*/g, ' ').trim(); }
+
+  /* 2교시 요청문 만들기 도우미 */
+  var TASKS = {
+    quiz: { obj: '형성 평가 문항을', cond: ['객관식 5문항, 보기는 4개', '오답 보기는 학생들이 흔히 가지는 오개념으로 구성', '마지막에 정답과 해설을 표로 정리'] },
+    reading: { obj: '수준별 읽기 자료를', cond: ['같은 내용을 기초, 보통, 심화 세 수준으로', '수준마다 400자 안팎', '수준마다 내용 확인 질문 2개'] },
+    opening: { obj: '수업 도입 활동을', cond: ['5분 안에 끝나는 활동 3가지', '활동마다 준비물과 진행 순서', '학생의 궁금증을 끌어내는 첫 질문 포함'] },
+    discussion: { obj: '모둠 토의 질문을', cond: ['정답이 하나로 정해지지 않는 질문 5개', '질문마다 토의를 이어 갈 보조 질문 1개', '학생 수준에 맞는 쉬운 말로'] },
+    rubric: { obj: '채점 기준표(루브릭)를', cond: ['평가 요소 3~4개, 수준은 3단계', '수준마다 관찰할 수 있는 행동으로 서술', '학생에게 미리 보여 줄 수 있는 쉬운 말로'] },
+    letter: { obj: '가정통신문 초안을', cond: ['A4 한 장 안쪽 분량', '정중하고 쉬운 말', '일정과 준비물은 표로 정리'] }
+  };
+  var bOut = document.getElementById('b-output');
+  var builder = document.getElementById('builder');
+  function buildRequest() {
+    if (!bOut) return;
+    var taskEl = document.getElementById('b-task');
+    var t = TASKS[taskEl ? taskEl.value : 'quiz'] || TASKS.quiz;
+    var cond = lines(val('b-cond'));
+    if (!cond.length) cond = t.cond;
+    var cls = oneLine(val('b-class'));
+    bOut.textContent =
+      '저는 교사이고, 아래 내용으로 ' + t.obj + ' 만들려고 합니다.\n\n' +
+      '학년: ' + (val('b-grade') || '[학교급과 학년]') + '\n' +
+      '과목과 단원: ' + (val('b-unit') || '[과목과 단원]') + '\n' +
+      (cls ? '학생 상황: ' + cls + '\n' : '') +
+      '\n조건:\n' + cond.map(function (c) { return '- ' + c; }).join('\n') +
+      '\n\n만들기 전에 더 알아야 할 점이 있으면 먼저 질문해 주세요.';
+  }
+  if (builder) {
+    builder.addEventListener('input', buildRequest);
+    builder.addEventListener('change', buildRequest);
+    buildRequest();
+  }
+
+  /* 7교시 계획서 */
+  var PLAN_FIELDS = ['p-scene', 'p-tool', 'p-who', 'p-must', 'p-not', 'p-when'];
+  var PLAN_KEY = 'vibe-training:plan';
+  var pOut = document.getElementById('p-output');
+  var pWhen = document.getElementById('p-when-out');
+  var plan = document.getElementById('plan');
+  function buildPlan(save) {
+    if (!pOut) return;
+    var must = lines(val('p-must'));
+    if (!must.length) must = ['[기능]'];
+    pOut.textContent =
+      '수업에 쓸 도구를 만들고 싶어요. 아직 파일은 만들지 말고 계획만 세워 주세요.\n\n' +
+      '만들 도구: ' + (val('p-tool') || '[만들 도구 한 줄 설명]') + '\n' +
+      '해결하고 싶은 문제: ' + (oneLine(val('p-scene')) || '[반복되거나 불편한 수업 장면]') + '\n' +
+      '쓰는 사람과 장소: ' + (val('p-who') || '[쓰는 사람과 장소]') + '\n' +
+      '꼭 필요한 기능:\n' + must.map(function (m) { return '- ' + m; }).join('\n') + '\n' +
+      '이번에는 안 할 것: ' + (val('p-not') || '[이번에는 안 할 것]') + '\n' +
+      '조건: 한국어 화면, 설치 없이 파일을 열면 동작, 학생 개인정보는 저장하거나 밖으로 보내지 않기\n\n' +
+      '어떤 파일을 만들지, 화면이 어떤 순서로 바뀌는지, 제가 확인할 점이 무엇인지 알려 주세요.';
+    if (pWhen) pWhen.textContent = val('p-when') ? '처음 써 볼 날: ' + val('p-when') : '처음 써 볼 날도 정해 두세요.';
+    if (save) {
+      var data = {};
+      PLAN_FIELDS.forEach(function (id) { var el = document.getElementById(id); data[id] = el ? el.value : ''; });
+      store(PLAN_KEY, JSON.stringify(data));
+    }
+  }
+  if (plan) {
+    var saved = {};
+    try { saved = JSON.parse(load(PLAN_KEY) || '{}') || {}; } catch (e) { saved = {}; }
+    PLAN_FIELDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && typeof saved[id] === 'string') el.value = saved[id];
+    });
+    plan.addEventListener('input', function () { buildPlan(true); });
+    var clearBtn = document.getElementById('plan-clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        PLAN_FIELDS.forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
+        forget(PLAN_KEY);
+        buildPlan(false);
+        announce('계획서 내용을 지웠습니다.');
+      });
+    }
+    buildPlan(false);
+  }
+})();
+</script>
+</body>
+</html>
