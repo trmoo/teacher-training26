@@ -26,7 +26,7 @@ jobs:
       # ⚠ 셸 변수 이름은 반드시 ASCII 로 쓴다. 한글로 쓰면 bash 가 command not found 로 죽는다.
       - name: 올릴 파일 점검
         run: |
-          for FILE in index.html claude-vibe-coding-teacher-training.html challenges.html; do
+          for FILE in index.html claude-vibe-coding-teacher-training.html challenges.html structure.html; do
             test -f "$FILE" || { echo "::error::$FILE 이 없습니다"; exit 1; }
           done
 
@@ -45,29 +45,36 @@ jobs:
             exit 1
           fi
 
-          for FILE in index.html challenges.html; do
+          for FILE in index.html challenges.html structure.html; do
             MARKS=$(grep -o 티쳐무 "$FILE" | wc -l)
             echo "저작권 표시 (${FILE}): ${MARKS}곳"
             if [ "$MARKS" -lt 3 ]; then
               echo "::error::${FILE} 의 저작권 표시가 사라졌습니다."
               exit 1
             fi
+            # 스크립트 배너는 둘째 줄로 확인한다 — 첫 줄은 CSS 머리 주석과 같아서 배너가 지워져도 통과한다
+            if ! grep -qF ' * 연수·학교 수업 목적으로만 이용해 주세요. 무단 배포·상업적 이용을 금합니다. */' "$FILE"; then
+              echo "::error::${FILE} 의 스크립트 저작권 배너가 지워졌습니다 (vite 설정의 output.postBanner 확인)."
+              exit 1
+            fi
           done
 
-          # 도전 과제 페이지도 빌드한 한 파일이어야 한다 (개발용 껍데기는 1KB 남짓)
-          CSIZE=$(wc -c < challenges.html)
-          echo "challenges.html 크기: ${CSIZE} 바이트"
-          if [ "$CSIZE" -lt 30000 ]; then
-            echo "::error::challenges.html 이 너무 작습니다 (${CSIZE} 바이트). 개발용 파일을 올렸을 수 있습니다."
-            exit 1
-          fi
+          # 도전 과제·프로젝트 구조 페이지도 빌드한 한 파일이어야 한다 (개발용 껍데기는 1KB 남짓)
+          for FILE in challenges.html structure.html; do
+            CSIZE=$(wc -c < "$FILE")
+            echo "${FILE} 크기: ${CSIZE} 바이트"
+            if [ "$CSIZE" -lt 30000 ]; then
+              echo "::error::${FILE} 이 너무 작습니다 (${CSIZE} 바이트). 개발용 파일을 올렸을 수 있습니다."
+              exit 1
+            fi
+          done
 
           echo "✅ 점검 통과"
 
       - name: 올릴 폴더 꾸리기
         run: |
           mkdir _site
-          cp index.html claude-vibe-coding-teacher-training.html challenges.html _site/
+          cp index.html claude-vibe-coding-teacher-training.html challenges.html structure.html _site/
           cp -r shots _site/
 
       - uses: actions/configure-pages@v5
